@@ -7,42 +7,42 @@ export const ITEMS = [
         manufacturingCompany: 'MyAnatomy'
     },
     {
-        id: 0,
+        id: 1,
         itemName: 'MyAnatomy MATCH Stock',
         dateOnAdded: '10/01/2021',
         currentStock: 500,
         manufacturingCompany: 'MyAnatomy'
     },
     {
-        id: 0,
+        id: 2,
         itemName: 'MyAnatomy MATCH Stock',
         dateOnAdded: '10/01/2021',
         currentStock: 500,
         manufacturingCompany: 'MyAnatomy'
     },
     {
-        id: 0,
+        id: 3,
         itemName: 'MyAnatomy MATCH Stock',
         dateOnAdded: '10/01/2021',
         currentStock: 500,
         manufacturingCompany: 'MyAnatomy'
     },
     {
-        id: 0,
+        id: 4,
         itemName: 'MyAnatomy MATCH Stock',
         dateOnAdded: '10/01/2021',
         currentStock: 500,
         manufacturingCompany: 'MyAnatomy'
     },
     {
-        id: 0,
+        id: 5,
         itemName: 'MyAnatomy MATCH Stock',
         dateOnAdded: '10/01/2021',
         currentStock: 500,
         manufacturingCompany: 'MyAnatomy'
     },
     {
-        id: 0,
+        id: 6,
         itemName: 'MyAnatomy MATCH Stock',
         dateOnAdded: '10/01/2021',
         currentStock: 500,
