@@ -6,8 +6,10 @@ class Header extends Component{
         return(
             <div>
                 <Navbar dark color="primary">
-                    <div className="contianer">
-                        <NavbarBrand><h1>Stock Management WebApp</h1></NavbarBrand>
+                    <div className="container">
+                        <div className="row">
+                            <NavbarBrand><h1>Stock Management WebApp</h1></NavbarBrand>
+                        </div>
                     </div>
                 </Navbar>
             </div>

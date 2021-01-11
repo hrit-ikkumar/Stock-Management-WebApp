@@ -26,8 +26,8 @@ class Items extends Component{
         // items element for every item & map for iterating each element in the array of js objects
         const items = this.props.items.map((item) =>{
             return(
-                <div className="col-12 col-md-5 ">
-                    <Card key={item.id}
+                <div className="col-11 col-md-5 m-2">
+                    <Card outline key={item.id}
                         onClick={() => this.onSelectedItem(item)}>
 
                         {/* Card title name */}
