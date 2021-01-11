@@ -1,27 +1,25 @@
 import logo from './logo.svg';
-import {Navbar, NavbarBrand} from 'reactstrap'; // always put third party css before our main css
 import './App.css';
 import React, {Component} from 'react';
-import Main from './components/MainComponent';
-import {BrowserRouter} from 'react-router-dom';
+import Header from './components/HeaderComponent';
+import Items from './components/ItemsComponent';
+import {ITEMS} from './shared/items';
 
 // Class Component
 class App extends Component{
+  constructor(props)
+  {
+    super(props);
+    this.state = {
+      items: ITEMS
+    };
+  }
+
   render() {
     return(
-      <div className="App">
-        {/*<BrowserRouter>
-            <div>
-              <Main/>
-            </div>
-          </BrowserRouter> 
-        */}
-        {/* Reactstrap element Navbar for navigation bar in application */}
-        <Navbar dark color="primary">
-          <div className="container">
-            <NavbarBrand href="/">Stock Management WebApp</NavbarBrand>
-          </div>
-        </Navbar>
+      <div>
+        <Header />
+        <Items items = {this.state.items}/>
       </div>
     );
   }
