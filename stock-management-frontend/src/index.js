@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import 'font-awesome/css/font-awesome.css'; // font-awesome part
+import 'bootstrap/dist/css/bootstrap.min.css'; // bootstrap part
+import 'bootstrap-social/bootstrap-social.css'; // bottstrap-social part
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';

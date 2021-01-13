@@ -11,15 +11,15 @@ class Items extends Component{
         
         // It's own state
         this.state = {
-            //selectedItem: null
+            selectedItem: null
         };
         // console.log("constructor called!");
     }
 
     /* onSelectedItem function for keeping track of selected item in given items */
-    /*onSelectedItem(item){
+    onSelectedItem(item){
         this.setState({selectedItem: item});
-    }*/
+    }
 
     componentDidMount(){
         // console.log("componentDidMount called!");
@@ -35,7 +35,7 @@ class Items extends Component{
             return(
                 <div className="col-11 col-md-5 m-2">
                     <Card outline key={item.id}
-                        onClick={() => this.props.onClick(item.id)}>
+                        onClick={() => this.onSelectedItem(item.id)}>
 
                         {/* Card title name */}
                         <CardTitle>{item.itemName}</CardTitle>
