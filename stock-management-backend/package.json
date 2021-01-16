@@ -1,0 +1,17 @@
+{
+  "name": "stock-management-backend",
+  "version": "1.0.0",
+  "description": "Backend REST API using Express.js for Stock Management WebApp",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Hritik Kumar Sharma",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^5.11.12",
+    "mongoose-currency": "^0.2.0"
+  }
+}
