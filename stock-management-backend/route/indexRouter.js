@@ -4,16 +4,7 @@ const ITEMS = require('../model/item'); // model imported
 const bodyParser = require('body-parser'); // body parser 
 const expressValidators = require('express-validator'); // express validator module
 
-
 const indexRouter = express.Router();
-
-/*
-    indexRouter requests 
-        1. GET : Fetches all the items (stocks) from the database
-        2. POST : Creating an item in database
-        3. PUT : Updating an item in database
-        4. DELETE : Deleting an item in database
-*/
 
 indexRouter.use(bodyParser.json()); // body parser for http body into json object
 
@@ -51,68 +42,18 @@ indexRouter.route('/')
         });
     }
     /*
-        REQUEST STRUCTURE:
-            {
-                "itemName": "Tesla Cars Stock",
-                "date": "2021-01-16T07:25:04.310Z" // default it will take current date
-                "currentStock": 1000,
-                "manufacturingCompany": "Tesla"
-            }
+    REQUEST STRUCTURE:
+        {
+            "itemName": "Tesla Cars Stock",
+            "date": "2021-01-16T07:25:04.310Z" // default it will take current date
+            "currentStock": 1000,
+            "manufacturingCompany": "Tesla"
+        }
 
-            items => name = milk, price *=2
-            db.items.updateMany({"name":"milk"}, {"price":{"$inc":2}})
     */
 
     // console.log(req.body);
     //var reqBodyLength = Object.keys(req.body).length;
-    /*console.log(reqBodyLength);
-    console.log(typeof(req.body.currentStock),
-    typeof(req.body.itemName),
-    typeof(req.body.manufacturingCompany) );*/
-    // express-validators should be used.
-    /* if(reqBodyLength < 3)
-    {
-        res.statusCode = 400;
-        res.setHeader('Content-Type', 'application/text');
-        res.send('ERROR Parameter Length is less than 3');
-    }
-    else if(reqBodyLength == 3)
-    {
-        if( typeof(req.body.currentStock) !== 'number' ||
-            typeof(req.body.itemName) !== 'string' ||
-            typeof(req.body.manufacturingCompany) !== 'string')
-        {
-            res.statusCode = 400;
-            res.setHeader('Content-Type', 'application/text');
-            res.send('ERROR Type of parameters are not right. Please check again');
-        }
-        else
-        {
-            createItemInItemsCollection(req.body);
-        }
-    }
-    else if(reqBodyLength == 4)
-    {
-        if( typeof(req.body.currentStock) !== 'number' ||
-            typeof(req.body.itemName) !== 'string' ||
-            typeof(req.body.manufacturingCompany) !== 'string' ||
-            typeof(req.body.dateAdded) !== 'string')
-        {
-            res.statusCode = 404;
-            res.setHeader('Content-Type', 'application/text');
-            res.send('ERROR Type of parameters are not right. Please check again');
-        }
-        else
-        {
-            createItemInItemsCollection(req.body);
-        }
-    }
-    else 
-    {
-        res.statusCode = 404;
-        res.setHeader('Content-Type', 'application/text');
-        res.send('ERROR LENGTH IS MORE THAN 4')
-    }*/
     createItemWithDateInItemsCollection(req);
 }, (err) => next(err))
 .put((req, res, next) => {
