@@ -31,6 +31,15 @@ indexRouter.route('/').get(function (req, res, next) {
     });
   });
 }).post(function (req, res, next) {
+  /*
+  REQUEST STRUCTURE:
+      {
+          "itemName": "Tesla Cars Stock",
+          "date": "2021-01-16T07:25:04.310Z" // default it will take current date
+          "currentStock": 1000,
+          "manufacturingCompany": "Tesla"
+      }
+   */
   // Always prefer to write arrow functions instead to actual function
   createItemWithDateInItemsCollection = function createItemWithDateInItemsCollection(request) {
     ITEMS.create({
@@ -50,18 +59,7 @@ indexRouter.route('/').get(function (req, res, next) {
       console.log(err);
       res.send('ERROR INVALID');
     });
-  };
-  /*
-  REQUEST STRUCTURE:
-      {
-          "itemName": "Tesla Cars Stock",
-          "date": "2021-01-16T07:25:04.310Z" // default it will take current date
-          "currentStock": 1000,
-          "manufacturingCompany": "Tesla"
-      }
-   */
-  // console.log(req.body);
-  //var reqBodyLength = Object.keys(req.body).length;
+  }; //var reqBodyLength = Object.keys(req.body).length;
 
 
   createItemWithDateInItemsCollection(req);
