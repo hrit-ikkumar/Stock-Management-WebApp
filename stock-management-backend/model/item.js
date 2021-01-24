@@ -12,7 +12,6 @@ Given properties of model:
 var item = new Schema({
     itemName: {
         type: String,
-        default: 'Test Item Name',
         required: true
     },
     dateAdded: {
