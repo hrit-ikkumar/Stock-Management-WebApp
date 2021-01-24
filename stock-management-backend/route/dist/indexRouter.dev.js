@@ -12,7 +12,9 @@ var ITEMS = require('../model/item'); // model imported
 var bodyParser = require('body-parser'); // body parser 
 
 
-var expressValidators = require('express-validator'); // express validator module
+var _require = require('express-validator'),
+    body = _require.body,
+    validationResult = _require.validationResult; // express-validator module for validations
 
 
 var indexRouter = express.Router();
@@ -30,7 +32,9 @@ indexRouter.route('/').get(function (req, res, next) {
       return next(err);
     });
   });
-}).post(function (req, res, next) {
+}).post(body('itemName').isLength({
+  min: 2
+}), function (req, res, next) {
   /*
   REQUEST STRUCTURE:
       {
@@ -62,7 +66,18 @@ indexRouter.route('/').get(function (req, res, next) {
   }; //var reqBodyLength = Object.keys(req.body).length;
 
 
-  createItemWithDateInItemsCollection(req);
+  var errors = validationResult(req); // all the erros will be stored here
+
+  if (!errors.isEmpty()) // When we failed to fulfil the validations
+    {
+      res.status(400);
+      res.setHeader('Content-Type', 'application/text');
+      res.send('ERROR PLEASE CHECK #1FDEF');
+      return res;
+    } else // everything is ok go ahead and create the document inside the db
+    {
+      createItemWithDateInItemsCollection(req);
+    }
 }, function (err) {
   return next(err);
 }).put(function (req, res, next) {

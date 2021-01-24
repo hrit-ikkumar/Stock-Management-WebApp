@@ -2,7 +2,7 @@ var express = require('express'); // imported express
 const mongoose = require('mongoose'); // imported mongoose
 const ITEMS = require('../model/item'); // model imported 
 const bodyParser = require('body-parser'); // body parser 
-const expressValidators = require('express-validator'); // express validator module
+const { body, validationResult } = require('express-validator'); // express-validator module for validations
 
 const indexRouter = express.Router();
 
@@ -20,7 +20,7 @@ indexRouter.route('/')
     },(err) => next(err)
     .catch((err) => next(err)));
 })
-.post((req,res,next) => {
+.post(body('itemName').isLength({min: 2}),(req,res,next) => {
     /*
     REQUEST STRUCTURE:
         {
@@ -53,7 +53,18 @@ indexRouter.route('/')
         });
     }
     //var reqBodyLength = Object.keys(req.body).length;
-    createItemWithDateInItemsCollection(req);
+    const errors = validationResult(req); // all the erros will be stored here
+    if(!errors.isEmpty()) // When we failed to fulfil the validations
+    {
+        res.status(400);
+        res.setHeader('Content-Type', 'application/text');
+        res.send('ERROR PLEASE CHECK #1FDEF');
+        return res;
+    }
+    else // everything is ok go ahead and create the document inside the db
+    {
+        createItemWithDateInItemsCollection(req);        
+    }
 }, (err) => next(err))
 .put((req, res, next) => {
     res.statusCode = 404;
