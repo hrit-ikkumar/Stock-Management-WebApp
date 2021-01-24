@@ -1,4 +1,8 @@
+"use strict";
+
 var mongoose = require('mongoose'); // package import
+
+
 var Schema = mongoose.Schema; // Schema class
 
 /*
@@ -10,25 +14,24 @@ Given properties of model:
 */
 
 var item = new Schema({
-    itemName: {
-        type: String,
-        default: 'Test Item Name',
-        required: true
-    },
-    dateAdded: {
-        type: Date,
-        default: new Date()
-    },
-    currentStock:{
-        type: Number,
-        default: 0
-    },
-    manufacturingCompany: {
-        type: String,
-        required: true
-    }
+  itemName: {
+    type: String,
+    "default": 'Test Item Name',
+    required: true
+  },
+  dateAdded: {
+    type: Date,
+    "default": new Date()
+  },
+  currentStock: {
+    type: Number,
+    "default": 0
+  },
+  manufacturingCompany: {
+    type: String,
+    required: true
+  }
 });
-
 var ITEMS = mongoose.model('item', item); // exported model as Item
 
 module.exports = ITEMS;

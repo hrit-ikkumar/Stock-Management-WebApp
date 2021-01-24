@@ -1,4 +1,5 @@
 var express = require('express');
+
 var app = express();
 var port = 3000;
 var indexRouter  = require('./route/indexRouter');
@@ -11,9 +12,8 @@ const connect = mongoose.connect(mongoDBAtlasURL); // mongoose connected with mo
 connect.then((db) => {
     console.log("Connected correctly to server");
 },(err) => {console.log(err)});
-
-app.use('/', indexRouter);
+app.use('/itemRouter', indexRouter);
 
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`)
-})
+});
