@@ -114,7 +114,36 @@ indexRouter.route('/')
 
 // /withoutDate sub-route for the POST (creation of item in db) wihout date
 indexRouter.route('/withoutDate')
-.post((req,res,next) => {
+.post(
+        // itemName's length should be in between 0 to 20 (It can't be empty)
+        body('itemName')
+        .isString().withMessage('itemName should be string') // condition of type
+        .not().isEmpty().withMessage('itemName should not be empty') // condition of empty
+        .trim() // will remove whitespace from both ends (start & end)
+        .isLength({min: 1, max: 20}).withMessage('itemName\'s length should be in between 1 to 20') // condition of minimum and maximum characters for itemName
+        // custom validator for the thing that itemName should be unique
+        .custom(value => {
+            return ITEMS.findOne({"itemName": value}).then(item => {
+                if(item){
+                    return Promise.reject('Item Name already exits!'); // Reject the creation of item that exits in database
+                }
+            });
+        }),
+    body('manufacturingCompany')
+        .isString().withMessage('manufacturingCompany should be string')
+        .not().isEmpty().withMessage('manufacturingCompany should not be empty')
+        .trim()
+        .isLength({min: 1, max: 20}).withMessage('manufacturingCompany\'s length should be in between 1 to 20'),
+    body('currentStock')
+        .not().isEmpty().withMessage('currentStock should have some value')
+        .isNumeric({min: 0}).withMessage('currentStock should be a number')
+        .custom(value => { // custom validation that value should not be negative
+            if(value < 0)
+                return Promise.reject('currentStock should not be negative');
+            else
+                return Promise.resolve('successfull');
+        }),
+    (req,res,next) => {
     createItemWithOutDateInItemsCollection = (request) => {
         ITEMS.create({
             itemName: request.body.itemName,
