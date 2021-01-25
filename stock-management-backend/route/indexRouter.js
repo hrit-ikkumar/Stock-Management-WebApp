@@ -10,7 +10,6 @@ indexRouter.use(bodyParser.json()); // body parser for http body into json objec
 
 indexRouter.route('/')
 .get((req, res, next) => {
-    console.log(req.query); // query printing
     ITEMS.find(req.query)
     .then((items) => {
         res.statusCode = 200;
@@ -37,8 +36,19 @@ indexRouter.route('/')
         }),
     body('dateAdded')
         //---------------------------------------------------------//
-        // issue with date format access
+        // issue with date format access /\/ RESOLVED/FIXED /\/
         //---------------------------------------------------------//
+        .custom(value => {
+            var date = Date.parse(value);
+            if(isNaN(date)) // given value string is not a proper date object
+            {
+                return Promise.reject('Given date string is not proper Date object!')
+            }
+            else
+            {
+                return Promise.resolve('Successfull');
+            }
+        })
         .isString().withMessage('dateAdded should be in Date format for example: 2021-01-22T08:49:34.081Z')
         .not().isEmpty().withMessage('dateAdded should not be empty'),
     body('manufacturingCompany')
@@ -81,7 +91,6 @@ indexRouter.route('/')
         .catch((err) => {
             res.statusCode = 400;
             res.setHeader('Content-Type', 'application/text');
-            console.log(err);
             res.send('ERROR INVALID');
         });
     }
@@ -102,7 +111,7 @@ indexRouter.route('/')
     }
 }, (err) => next(err))
 .put((req, res, next) => {
-    res.statusCode = 404;
+    res.statusCode = 400;
     res.setHeader('Content-Type', 'application/text');
     res.send('PUT IS INVALID');
 }, (err) => next(err))
@@ -113,7 +122,7 @@ indexRouter.route('/')
             // checking weather given object id is valid ObjectId or not?
             if(! mongoose.isValidObjectId(value))
             {
-                return Promise.reject('_id should be JavaScript Object');
+                return Promise.reject('_id should be a valid ObjectId');
             }
             else
             {
@@ -164,6 +173,10 @@ indexRouter.route('/withoutDate')
                 if(item){
                     return Promise.reject('Item Name already exits!'); // Reject the creation of item that exits in database
                 }
+                else
+                {
+                    return Promise.resolve('Successfull'); 
+                }
             });
         }),
     body('manufacturingCompany')
@@ -196,7 +209,6 @@ indexRouter.route('/withoutDate')
         .catch((err) => {
             res.statusCode = 400;
             res.setHeader('Content-Type', 'application/text');
-            console.log(err);
             res.send('ERROR INVALID');
         });
     }

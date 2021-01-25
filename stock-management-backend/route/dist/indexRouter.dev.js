@@ -21,8 +21,6 @@ var indexRouter = express.Router();
 indexRouter.use(bodyParser.json()); // body parser for http body into json object
 
 indexRouter.route('/').get(function (req, res, next) {
-  console.log(req.query); // query printing
-
   ITEMS.find(req.query).then(function (items) {
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
@@ -50,9 +48,18 @@ body('itemName').isString().withMessage('itemName should be string') // conditio
     }
   });
 }), body('dateAdded') //---------------------------------------------------------//
-// issue with date format access
+// issue with date format access /\/ RESOLVED/FIXED /\/
 //---------------------------------------------------------//
-.isString().withMessage('dateAdded should be in Date format for example: 2021-01-22T08:49:34.081Z').not().isEmpty().withMessage('dateAdded should not be empty'), body('manufacturingCompany').isString().withMessage('manufacturingCompany should be string').not().isEmpty().withMessage('manufacturingCompany should not be empty').trim().isLength({
+.custom(function (value) {
+  var date = Date.parse(value);
+
+  if (isNaN(date)) // given value string is not a proper date object
+    {
+      return Promise.reject('Given date string is not proper Date object!');
+    } else {
+    return Promise.resolve('Successfull');
+  }
+}).isString().withMessage('dateAdded should be in Date format for example: 2021-01-22T08:49:34.081Z').not().isEmpty().withMessage('dateAdded should not be empty'), body('manufacturingCompany').isString().withMessage('manufacturingCompany should be string').not().isEmpty().withMessage('manufacturingCompany should not be empty').trim().isLength({
   min: 1,
   max: 20
 }).withMessage('manufacturingCompany\'s length should be in between 1 to 20'), body('currentStock').not().isEmpty().withMessage('currentStock should have some value').isNumeric({
@@ -90,7 +97,6 @@ body('itemName').isString().withMessage('itemName should be string') // conditio
             })["catch"](function (err) {
               res.statusCode = 400;
               res.setHeader('Content-Type', 'application/text');
-              console.log(err);
               res.send('ERROR INVALID');
             }));
 
@@ -119,7 +125,7 @@ body('itemName').isString().withMessage('itemName should be string') // conditio
 }, function (err) {
   return next(err);
 }).put(function (req, res, next) {
-  res.statusCode = 404;
+  res.statusCode = 400;
   res.setHeader('Content-Type', 'application/text');
   res.send('PUT IS INVALID');
 }, function (err) {
@@ -127,7 +133,7 @@ body('itemName').isString().withMessage('itemName should be string') // conditio
 })["delete"](body('_id').not().isEmpty().withMessage('_id field should not be empty').custom(function (value) {
   // checking weather given object id is valid ObjectId or not?
   if (!mongoose.isValidObjectId(value)) {
-    return Promise.reject('_id should be JavaScript Object');
+    return Promise.reject('_id should be a valid ObjectId');
   } else {
     return Promise.resolve('Successfull');
   }
@@ -190,6 +196,8 @@ body('itemName').isString().withMessage('itemName should be string') // conditio
   }).then(function (item) {
     if (item) {
       return Promise.reject('Item Name already exits!'); // Reject the creation of item that exits in database
+    } else {
+      return Promise.resolve('Successfull');
     }
   });
 }), body('manufacturingCompany').isString().withMessage('manufacturingCompany should be string').not().isEmpty().withMessage('manufacturingCompany should not be empty').trim().isLength({
@@ -216,7 +224,6 @@ body('itemName').isString().withMessage('itemName should be string') // conditio
     })["catch"](function (err) {
       res.statusCode = 400;
       res.setHeader('Content-Type', 'application/text');
-      console.log(err);
       res.send('ERROR INVALID');
     });
   };
