@@ -4,7 +4,7 @@
   "description": "Backend REST API using Express.js for Stock Management WebApp",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Hritik Kumar Sharma",
@@ -13,6 +13,7 @@
     "express": "^4.17.1",
     "express-validator": "^6.9.2",
     "mongoose": "^5.11.12",
-    "mongoose-currency": "^0.2.0"
+    "mongoose-currency": "^0.2.0",
+    "nodemon": "^2.0.7"
   }
 }
