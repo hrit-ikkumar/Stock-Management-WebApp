@@ -31,6 +31,6 @@ var item = new Schema({
     required: true
   }
 });
-var ITEMS = mongoose.model('item', item); // exported model as Item
+var ITEMS = mongoose.model('item', item); // exported model as Item & db will create collection as items
 
 module.exports = ITEMS;
