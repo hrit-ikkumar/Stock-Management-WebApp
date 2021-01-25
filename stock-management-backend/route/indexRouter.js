@@ -2,7 +2,7 @@ var express = require('express'); // imported express
 const mongoose = require('mongoose'); // imported mongoose
 const ITEMS = require('../model/item'); // model imported 
 const bodyParser = require('body-parser'); // body parser 
-const expressValidators = require('express-validator'); // express validator module
+const { body, validationResult } = require('express-validator'); // express-validator module for validations
 
 const indexRouter = express.Router();
 
@@ -20,10 +20,54 @@ indexRouter.route('/')
     },(err) => next(err)
     .catch((err) => next(err)));
 })
-.post((req,res,next) => {
+.post(
+    // itemName's length should be in between 0 to 20 (It can't be empty)
+    body('itemName')
+        .isString().withMessage('itemName should be string') // condition of type
+        .not().isEmpty().withMessage('itemName should not be empty') // condition of empty
+        .trim() // will remove whitespace from both ends (start & end)
+        .isLength({min: 1, max: 20}).withMessage('itemName\'s length should be in between 1 to 20') // condition of minimum and maximum characters for itemName
+        // custom validator for the thing that itemName should be unique
+        .custom(value => {
+            return ITEMS.findOne({"itemName": value}).then(item => {
+                if(item){
+                    return Promise.reject('Item Name already exits!'); // Reject the creation of item that exits in database
+                }
+            });
+        }),
+    body('dateAdded')
+        //---------------------------------------------------------//
+        // issue with date format access
+        //---------------------------------------------------------//
+        .isString().withMessage('dateAdded should be in Date format for example: 2021-01-22T08:49:34.081Z')
+        .not().isEmpty().withMessage('dateAdded should not be empty'),
+    body('manufacturingCompany')
+        .isString().withMessage('manufacturingCompany should be string')
+        .not().isEmpty().withMessage('manufacturingCompany should not be empty')
+        .trim()
+        .isLength({min: 1, max: 20}).withMessage('manufacturingCompany\'s length should be in between 1 to 20'),
+    body('currentStock')
+        .not().isEmpty().withMessage('currentStock should have some value')
+        .isNumeric({min: 0}).withMessage('currentStock should be a number')
+        .custom(value => { // custom validation that value should not be negative
+            if(value < 0)
+                return Promise.reject('currentStock should not be negative');
+            else
+                return Promise.resolve('successfull');
+        }),
+    (req,res,next) => {
+    /* REQUEST STRUCTURE:
+        {
+            "itemName": "Tesla Cars Stock",
+            "date": "2021-01-16T07:25:04.310Z"
+            "currentStock": 1000,
+            "manufacturingCompany": "Tesla"
+        }
+    */
+
     // Always prefer to write arrow functions instead to actual function
-     createItemWithDateInItemsCollection = (request) => {
-        ITEMS.create({
+     createItemWithDateInItemsCollection = async (request) => {
+        await ITEMS.create({
             itemName: request.body.itemName,
             dateAdded: request.body.dateAdded,
             currentStock: request.body.currentStock,
@@ -41,20 +85,21 @@ indexRouter.route('/')
             res.send('ERROR INVALID');
         });
     }
-    /*
-    REQUEST STRUCTURE:
-        {
-            "itemName": "Tesla Cars Stock",
-            "date": "2021-01-16T07:25:04.310Z" // default it will take current date
-            "currentStock": 1000,
-            "manufacturingCompany": "Tesla"
-        }
+    // var reqBodyLength = Object.keys(req.body).length;
+    // Finds the validation errors in this request and wraps them in an object with handy functions
+    const errors = validationResult(req); 
 
-    */
-
-    // console.log(req.body);
-    //var reqBodyLength = Object.keys(req.body).length;
-    createItemWithDateInItemsCollection(req);
+    if(!errors.isEmpty()) // When we failed to fulfil the validations
+    {
+        res.status(400);
+        res.setHeader('Content-Type', 'application/text');
+        res.send('ERROR PLEASE CHECK #1FDEF' + JSON.stringify(errors.array()));
+        return res;
+    }
+    else // everything is ok go ahead and create the document inside the db
+    {
+        createItemWithDateInItemsCollection(req);        
+    }
 }, (err) => next(err))
 .put((req, res, next) => {
     res.statusCode = 404;
@@ -67,6 +112,7 @@ indexRouter.route('/')
     res.send('DELETE IS INVALID');
 }, (err) => console.log(err));
 
+// /withoutDate sub-route for the POST (creation of item in db) wihout date
 indexRouter.route('/withoutDate')
 .post((req,res,next) => {
     createItemWithOutDateInItemsCollection = (request) => {
