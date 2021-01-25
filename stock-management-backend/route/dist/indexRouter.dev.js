@@ -124,10 +124,53 @@ body('itemName').isString().withMessage('itemName should be string') // conditio
   res.send('PUT IS INVALID');
 }, function (err) {
   return next(err);
-})["delete"](function (req, res, next) {
-  res.statusCode = 404;
-  res.setHeader('Content-Type', 'application/text');
-  res.send('DELETE IS INVALID');
+})["delete"](body('_id').not().isEmpty().withMessage('_id field should not be empty').custom(function (value) {
+  // checking weather given object id is valid ObjectId or not?
+  if (!mongoose.isValidObjectId(value)) {
+    return Promise.reject('_id should be JavaScript Object');
+  } else {
+    return Promise.resolve('Successfull');
+  }
+}), function (req, res, next) {
+  deleteItemInItemsCollection = function deleteItemInItemsCollection(request) {
+    return regeneratorRuntime.async(function deleteItemInItemsCollection$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            _context2.next = 2;
+            return regeneratorRuntime.awrap(ITEMS.deleteOne({
+              "_id": request._id
+            }).then(function (item) {
+              res.statusCode = 200; // Successfull
+
+              res.setHeader('Content-Type', 'application/text');
+              res.send('Successfully deleted');
+            }, function (err) {
+              return next(err);
+            })["catch"](function (err) {
+              res.statusCode = 400; // Bad Request
+
+              res.setHeader('Content-Type', 'application/text');
+              res.send('Id is not present in Collection');
+            }));
+
+          case 2:
+          case "end":
+            return _context2.stop();
+        }
+      }
+    });
+  };
+
+  var erros = validationResult(req); // all the errors in validations will be stored here
+
+  if (!erros.isEmpty()) {
+    res.statusCode = 404;
+    res.setHeader('Content-Type', 'application/text');
+    res.send('DELETE IS INVALID' + JSON.stringify(erros));
+  } else {
+    deleteItemInItemsCollection(req);
+  }
 }, function (err) {
   return console.log(err);
 }); // /withoutDate sub-route for the POST (creation of item in db) wihout date

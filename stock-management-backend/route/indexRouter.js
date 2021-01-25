@@ -106,10 +106,47 @@ indexRouter.route('/')
     res.setHeader('Content-Type', 'application/text');
     res.send('PUT IS INVALID');
 }, (err) => next(err))
-.delete((req, res, next) => {
-    res.statusCode = 404;
-    res.setHeader('Content-Type', 'application/text');
-    res.send('DELETE IS INVALID');
+.delete(
+    body('_id')
+        .not().isEmpty().withMessage('_id field should not be empty')
+        .custom( value => {
+            // checking weather given object id is valid ObjectId or not?
+            if(! mongoose.isValidObjectId(value))
+            {
+                return Promise.reject('_id should be JavaScript Object');
+            }
+            else
+            {
+                return Promise.resolve('Successfull'); 
+            }
+        }),
+    (req, res, next) => {
+    
+
+    deleteItemInItemsCollection = async (request) => {
+        await ITEMS.deleteOne({"_id": request._id})
+            .then((item) => {
+                res.statusCode = 200; // Successfull
+                res.setHeader('Content-Type', 'application/text');
+                res.send('Successfully deleted'); 
+            }, (err) => next(err))
+            .catch((err) => {
+                res.statusCode = 400; // Bad Request
+                res.setHeader('Content-Type', 'application/text');
+                res.send('Id is not present in Collection');
+            })
+    }
+    const erros = validationResult(req); // all the errors in validations will be stored here
+    if(!erros.isEmpty())
+    {
+        res.statusCode = 404;
+        res.setHeader('Content-Type', 'application/text');
+        res.send('DELETE IS INVALID' + JSON.stringify(erros));
+    }
+    else
+    {
+        deleteItemInItemsCollection(req);
+    }
 }, (err) => console.log(err));
 
 // /withoutDate sub-route for the POST (creation of item in db) wihout date
