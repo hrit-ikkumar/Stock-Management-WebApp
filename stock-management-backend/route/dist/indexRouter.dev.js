@@ -197,7 +197,7 @@ body('itemName').isString().withMessage('itemName should be string') // conditio
     if (item) {
       return Promise.reject('Item Name already exits!'); // Reject the creation of item that exits in database
     } else {
-      return Promise.resolve('Successfull');
+      return Promise.resolve('Successfull'); // When it is successfull
     }
   });
 }), body('manufacturingCompany').isString().withMessage('manufacturingCompany should be string').not().isEmpty().withMessage('manufacturingCompany should not be empty').trim().isLength({
