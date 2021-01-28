@@ -21,8 +21,6 @@ var indexRouter = express.Router();
 indexRouter.use(bodyParser.json()); // body parser for http body into json object
 
 indexRouter.route('/').get(function (req, res, next) {
-  console.log(req.query); // query printing
-
   ITEMS.find(req.query).then(function (items) {
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
@@ -34,6 +32,11 @@ indexRouter.route('/').get(function (req, res, next) {
   });
 }).post( // itemName's length should be in between 0 to 20 (It can't be empty)
 body('itemName').isString().withMessage('itemName should be string') // condition of type
+
+/* **************************************** */
+// notEmpty() can be used here
+
+/* **************************************** */
 .not().isEmpty().withMessage('itemName should not be empty') // condition of empty
 .trim() // will remove whitespace from both ends (start & end)
 .isLength({
@@ -50,9 +53,21 @@ body('itemName').isString().withMessage('itemName should be string') // conditio
     }
   });
 }), body('dateAdded') //---------------------------------------------------------//
-// issue with date format access
+// issue with date format access /\/ RESOLVED/FIXED /\/
+// Reference, Object Embedded
+// db.zips.find(query, {})
+// BSON & Update a document without set
 //---------------------------------------------------------//
-.isString().withMessage('dateAdded should be in Date format for example: 2021-01-22T08:49:34.081Z').not().isEmpty().withMessage('dateAdded should not be empty'), body('manufacturingCompany').isString().withMessage('manufacturingCompany should be string').not().isEmpty().withMessage('manufacturingCompany should not be empty').trim().isLength({
+.custom(function (value) {
+  var date = Date.parse(value);
+
+  if (isNaN(date)) // given value string is not a proper date object
+    {
+      return Promise.reject('Given date string is not proper Date object!');
+    } else {
+    return Promise.resolve('Successfull');
+  }
+}).isString().withMessage('dateAdded should be in Date format for example: 2021-01-22T08:49:34.081Z').not().isEmpty().withMessage('dateAdded should not be empty'), body('manufacturingCompany').isString().withMessage('manufacturingCompany should be string').not().isEmpty().withMessage('manufacturingCompany should not be empty').trim().isLength({
   min: 1,
   max: 20
 }).withMessage('manufacturingCompany\'s length should be in between 1 to 20'), body('currentStock').not().isEmpty().withMessage('currentStock should have some value').isNumeric({
@@ -90,7 +105,6 @@ body('itemName').isString().withMessage('itemName should be string') // conditio
             })["catch"](function (err) {
               res.statusCode = 400;
               res.setHeader('Content-Type', 'application/text');
-              console.log(err);
               res.send('ERROR INVALID');
             }));
 
@@ -119,20 +133,96 @@ body('itemName').isString().withMessage('itemName should be string') // conditio
 }, function (err) {
   return next(err);
 }).put(function (req, res, next) {
-  res.statusCode = 404;
+  res.statusCode = 400;
   res.setHeader('Content-Type', 'application/text');
   res.send('PUT IS INVALID');
 }, function (err) {
   return next(err);
-})["delete"](function (req, res, next) {
-  res.statusCode = 404;
-  res.setHeader('Content-Type', 'application/text');
-  res.send('DELETE IS INVALID');
+})["delete"](body('_id').not().isEmpty().withMessage('_id field should not be empty').custom(function (value) {
+  // checking weather given object id is valid ObjectId or not?
+  if (!mongoose.isValidObjectId(value)) {
+    return Promise.reject('_id should be a valid ObjectId');
+  } else {
+    return Promise.resolve('Successfull');
+  }
+}), function (req, res, next) {
+  // path param & query param TODO
+  deleteItemInItemsCollection = function deleteItemInItemsCollection(request) {
+    return regeneratorRuntime.async(function deleteItemInItemsCollection$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            _context2.next = 2;
+            return regeneratorRuntime.awrap(ITEMS.deleteOne({
+              "_id": request._id
+            }).then(function (item) {
+              if (item == null) {
+                next(err);
+                return;
+              }
+
+              res.statusCode = 200; // Successfull
+
+              res.setHeader('Content-Type', 'application/text');
+              res.send('Successfully deleted');
+            }, function (err) {
+              return next(err);
+            })["catch"](function (err) {
+              res.statusCode = 400; // Bad Request
+
+              res.setHeader('Content-Type', 'application/text');
+              res.send('Id is not present in Collection');
+            }));
+
+          case 2:
+          case "end":
+            return _context2.stop();
+        }
+      }
+    });
+  };
+
+  var erros = validationResult(req); // all the errors in validations will be stored here
+
+  if (!erros.isEmpty()) {
+    res.statusCode = 404;
+    res.setHeader('Content-Type', 'application/text');
+    res.send('DELETE IS INVALID' + JSON.stringify(erros));
+  } else {
+    deleteItemInItemsCollection(req);
+  }
 }, function (err) {
   return console.log(err);
 }); // /withoutDate sub-route for the POST (creation of item in db) wihout date
 
-indexRouter.route('/withoutDate').post(function (req, res, next) {
+indexRouter.route('/withoutDate').post( // itemName's length should be in between 0 to 20 (It can't be empty)
+body('itemName').isString().withMessage('itemName should be string') // condition of type
+.not().isEmpty().withMessage('itemName should not be empty') // condition of empty
+.trim() // will remove whitespace from both ends (start & end)
+.isLength({
+  min: 1,
+  max: 20
+}).withMessage('itemName\'s length should be in between 1 to 20') // condition of minimum and maximum characters for itemName
+// custom validator for the thing that itemName should be unique
+.custom(function (value) {
+  return ITEMS.findOne({
+    "itemName": value
+  }).then(function (item) {
+    if (item) {
+      return Promise.reject('Item Name already exits!'); // Reject the creation of item that exits in database
+    } else {
+      return Promise.resolve('Successfull'); // When it is successfull
+    }
+  });
+}), body('manufacturingCompany').isString().withMessage('manufacturingCompany should be string').not().isEmpty().withMessage('manufacturingCompany should not be empty').trim().isLength({
+  min: 1,
+  max: 20
+}).withMessage('manufacturingCompany\'s length should be in between 1 to 20'), body('currentStock').not().isEmpty().withMessage('currentStock should have some value').isNumeric({
+  min: 0
+}).withMessage('currentStock should be a number').custom(function (value) {
+  // custom validation that value should not be negative
+  if (value < 0) return Promise.reject('currentStock should not be negative');else return Promise.resolve('successfull');
+}), function (req, res, next) {
   createItemWithOutDateInItemsCollection = function createItemWithOutDateInItemsCollection(request) {
     ITEMS.create({
       itemName: request.body.itemName,
@@ -148,12 +238,74 @@ indexRouter.route('/withoutDate').post(function (req, res, next) {
     })["catch"](function (err) {
       res.statusCode = 400;
       res.setHeader('Content-Type', 'application/text');
-      console.log(err);
       res.send('ERROR INVALID');
     });
   };
 
   createItemWithOutDateInItemsCollection(req);
+}, function (err) {
+  return console.log(err);
+});
+indexRouter.route('/increaseStocks').get(body('_id').not().isEmpty().withMessage('_id field should not be empty').custom(function (value) {
+  // checking weather given object id is valid ObjectId or not?
+  if (!mongoose.isValidObjectId(value)) {
+    return Promise.reject('_id should be a valid ObjectId');
+  } else {
+    return Promise.resolve('Successfull');
+  }
+}).custom(function (id) {
+  return ITEMS.findOne({
+    "_id": id
+  }).then(function (item) {
+    if (!item) {
+      return Promise.reject('Id doesn\'t exit!'); // Reject the creation of item that exits in database
+    } else {
+      return Promise.resolve('Successfull');
+    }
+  });
+}), function (req, res, next) {
+  ITEMS.findOne({
+    "_id": req.body._id
+  }).then(function (item) {
+    res.statusCode = 200; // success
+
+    res.setHeader('Content-Type', 'application/json');
+    res.json(item); // response
+  })["catch"](function (err) {
+    return console.log(err);
+  });
+}).post(body('_id').not().isEmpty().withMessage('_id field should not be empty').custom(function (value) {
+  // checking weather given object id is valid ObjectId or not?
+  if (!mongoose.isValidObjectId(value)) {
+    return Promise.reject('_id should be a valid ObjectId');
+  } else {
+    return Promise.resolve('Successfull');
+  }
+}).custom(function (id) {
+  return ITEMS.findOne({
+    "_id": id
+  }).then(function (item) {
+    if (!item) {
+      return Promise.reject('Id doesn\'t exit!'); // Reject the creation of item that exits in database
+    } else {
+      return Promise.resolve('Successfull');
+    }
+  });
+}), function (req, res, next) {
+  ITEMS.updateOne({
+    "_id": req.body._id
+  }, {
+    "$inc": {
+      "currentStock": 1
+    }
+  }).then(function (item) {
+    res.statusCode = 200; // success
+
+    res.setHeader('Content-Type', 'application/text');
+    res.send('currentStock has been updated'); // response
+  })["catch"](function (err) {
+    return console.log(err);
+  });
 }, function (err) {
   return console.log(err);
 });
