@@ -32,6 +32,11 @@ indexRouter.route('/').get(function (req, res, next) {
   });
 }).post( // itemName's length should be in between 0 to 20 (It can't be empty)
 body('itemName').isString().withMessage('itemName should be string') // condition of type
+
+/* **************************************** */
+// notEmpty() can be used here
+
+/* **************************************** */
 .not().isEmpty().withMessage('itemName should not be empty') // condition of empty
 .trim() // will remove whitespace from both ends (start & end)
 .isLength({
@@ -49,6 +54,9 @@ body('itemName').isString().withMessage('itemName should be string') // conditio
   });
 }), body('dateAdded') //---------------------------------------------------------//
 // issue with date format access /\/ RESOLVED/FIXED /\/
+// Reference, Object Embedded
+// db.zips.find(query, {})
+// BSON & Update a document without set
 //---------------------------------------------------------//
 .custom(function (value) {
   var date = Date.parse(value);
@@ -138,6 +146,7 @@ body('itemName').isString().withMessage('itemName should be string') // conditio
     return Promise.resolve('Successfull');
   }
 }), function (req, res, next) {
+  // path param & query param TODO
   deleteItemInItemsCollection = function deleteItemInItemsCollection(request) {
     return regeneratorRuntime.async(function deleteItemInItemsCollection$(_context2) {
       while (1) {
@@ -147,6 +156,11 @@ body('itemName').isString().withMessage('itemName should be string') // conditio
             return regeneratorRuntime.awrap(ITEMS.deleteOne({
               "_id": request._id
             }).then(function (item) {
+              if (item == null) {
+                next(err);
+                return;
+              }
+
               res.statusCode = 200; // Successfull
 
               res.setHeader('Content-Type', 'application/text');
@@ -229,6 +243,69 @@ body('itemName').isString().withMessage('itemName should be string') // conditio
   };
 
   createItemWithOutDateInItemsCollection(req);
+}, function (err) {
+  return console.log(err);
+});
+indexRouter.route('/increaseStocks').get(body('_id').not().isEmpty().withMessage('_id field should not be empty').custom(function (value) {
+  // checking weather given object id is valid ObjectId or not?
+  if (!mongoose.isValidObjectId(value)) {
+    return Promise.reject('_id should be a valid ObjectId');
+  } else {
+    return Promise.resolve('Successfull');
+  }
+}).custom(function (id) {
+  return ITEMS.findOne({
+    "_id": id
+  }).then(function (item) {
+    if (!item) {
+      return Promise.reject('Id doesn\'t exit!'); // Reject the creation of item that exits in database
+    } else {
+      return Promise.resolve('Successfull');
+    }
+  });
+}), function (req, res, next) {
+  ITEMS.findOne({
+    "_id": req.body._id
+  }).then(function (item) {
+    res.statusCode = 200; // success
+
+    res.setHeader('Content-Type', 'application/json');
+    res.json(item); // response
+  })["catch"](function (err) {
+    return console.log(err);
+  });
+}).post(body('_id').not().isEmpty().withMessage('_id field should not be empty').custom(function (value) {
+  // checking weather given object id is valid ObjectId or not?
+  if (!mongoose.isValidObjectId(value)) {
+    return Promise.reject('_id should be a valid ObjectId');
+  } else {
+    return Promise.resolve('Successfull');
+  }
+}).custom(function (id) {
+  return ITEMS.findOne({
+    "_id": id
+  }).then(function (item) {
+    if (!item) {
+      return Promise.reject('Id doesn\'t exit!'); // Reject the creation of item that exits in database
+    } else {
+      return Promise.resolve('Successfull');
+    }
+  });
+}), function (req, res, next) {
+  ITEMS.updateOne({
+    "_id": req.body._id
+  }, {
+    "$inc": {
+      "currentStock": 1
+    }
+  }).then(function (item) {
+    res.statusCode = 200; // success
+
+    res.setHeader('Content-Type', 'application/text');
+    res.send('currentStock has been updated'); // response
+  })["catch"](function (err) {
+    return console.log(err);
+  });
 }, function (err) {
   return console.log(err);
 });

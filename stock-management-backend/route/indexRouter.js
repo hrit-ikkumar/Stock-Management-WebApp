@@ -23,6 +23,9 @@ indexRouter.route('/')
     // itemName's length should be in between 0 to 20 (It can't be empty)
     body('itemName')
         .isString().withMessage('itemName should be string') // condition of type
+        /* **************************************** */
+        // notEmpty() can be used here
+        /* **************************************** */
         .not().isEmpty().withMessage('itemName should not be empty') // condition of empty
         .trim() // will remove whitespace from both ends (start & end)
         .isLength({min: 1, max: 20}).withMessage('itemName\'s length should be in between 1 to 20') // condition of minimum and maximum characters for itemName
@@ -37,6 +40,9 @@ indexRouter.route('/')
     body('dateAdded')
         //---------------------------------------------------------//
         // issue with date format access /\/ RESOLVED/FIXED /\/
+        // Reference, Object Embedded
+        // db.zips.find(query, {})
+        // BSON & Update a document without set
         //---------------------------------------------------------//
         .custom(value => {
             var date = Date.parse(value);
@@ -130,11 +136,16 @@ indexRouter.route('/')
             }
         }),
     (req, res, next) => {
-    
+    // path param & query param TODO
 
     deleteItemInItemsCollection = async (request) => {
         await ITEMS.deleteOne({"_id": request._id})
             .then((item) => {
+                if(item == null)
+                {
+                    next(err);
+                    return;
+                }
                 res.statusCode = 200; // Successfull
                 res.setHeader('Content-Type', 'application/text');
                 res.send('Successfully deleted'); 
@@ -213,6 +224,78 @@ indexRouter.route('/withoutDate')
         });
     }
     createItemWithOutDateInItemsCollection(req); 
+}, (err) => console.log(err));
+
+indexRouter.route('/increaseStocks')
+.get(
+    body('_id')
+    .not().isEmpty().withMessage('_id field should not be empty')
+    .custom( value => {
+        // checking weather given object id is valid ObjectId or not?
+        if(! mongoose.isValidObjectId(value))
+        {
+            return Promise.reject('_id should be a valid ObjectId');
+        }
+        else
+        {
+            return Promise.resolve('Successfull'); 
+        }
+    })
+    .custom(id => {
+        return ITEMS.findOne({"_id": id}).then(item => {
+            if(!item){
+                return Promise.reject('Id doesn\'t exit!'); // Reject the creation of item that exits in database
+            }
+            else
+            {
+                return Promise.resolve('Successfull');
+            }
+        });
+    }),
+    (req,res,next) => {
+        ITEMS.findOne({"_id": req.body._id})
+        .then((item) => {
+            res.statusCode = 200; // success
+            res.setHeader('Content-Type', 'application/json');
+            res.json(item); // response
+        })
+        .catch((err) => console.log(err)); 
+    }
+)
+
+.post(
+    body('_id')
+        .not().isEmpty().withMessage('_id field should not be empty')
+        .custom( value => {
+            // checking weather given object id is valid ObjectId or not?
+            if(! mongoose.isValidObjectId(value))
+            {
+                return Promise.reject('_id should be a valid ObjectId');
+            }
+            else
+            {
+                return Promise.resolve('Successfull'); 
+            }
+        })
+        .custom(id => {
+            return ITEMS.findOne({"_id": id}).then(item => {
+                if(!item){
+                    return Promise.reject('Id doesn\'t exit!'); // Reject the creation of item that exits in database
+                }
+                else
+                {
+                    return Promise.resolve('Successfull');
+                }
+            });
+        }),
+    (req,res,next) => {
+        ITEMS.updateOne({"_id": req.body._id}, {"$inc": {"currentStock": 1}})
+        .then((item) => {
+            res.statusCode = 200; // success
+            res.setHeader('Content-Type', 'application/text');
+            res.send('currentStock has been updated'); // response
+        })
+        .catch((err) => console.log(err)); 
 }, (err) => console.log(err));
 
 
