@@ -16,6 +16,16 @@ class Items extends Component{
         // console.log("constructor called!");
     }
 
+    /*
+        Why I am not using function keyword because
+        class component has methods not the functions
+        they are binded together with state.
+        So, we don't need to use function keyword here.
+        if we are using functional component then we can 
+        use the function keyword to define the functions 
+        inside the functional component.
+    */
+
     /* onSelectedItem function for keeping track of selected item in given items */
     onSelectedItem(item){
         this.setState({selectedItem: item});

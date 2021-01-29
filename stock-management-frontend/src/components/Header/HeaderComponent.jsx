@@ -26,13 +26,10 @@ const Header = () => {
         <div className={classes.root}>
         <AppBar position="static">
             <Toolbar>
-            <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
-                <MenuIcon />
-            </IconButton>
-            <Typography variant="h6" className={classes.title}>
-                Stock Management WebApp
-            </Typography>
-            <Button color="inherit">Login</Button>
+              {/* Header of application */}
+              <Typography variant="h6" className={classes.title}>
+                  Stock Management WebApp
+              </Typography>
             </Toolbar>
         </AppBar>
         </div>
