@@ -2,30 +2,32 @@ var express = require('express'); // imported express
 const mongoose = require('mongoose'); // imported mongoose
 const ITEMS = require('../model/item'); // model imported 
 const bodyParser = require('body-parser'); // body parser 
-const { body, validationResult } = require('express-validator'); // express-validator module for validations
+const { body, validationResult,query, param } = require('express-validator'); // express-validator module for validations
 
 const indexRouter = express.Router();
 
 indexRouter.use(bodyParser.json()); // body parser for http body into json object
 
 indexRouter.route('/')
+// 3. Users should be able to view all the items
 .get((req, res, next) => {
     ITEMS.find(req.query)
     .then((items) => {
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.json(items);
-        //console.log(JSON.stringify(items, null, 2)); // printing the items 
-    },(err) => next(err)
-    .catch((err) => next(err)));
-})
+    },(err) => next(err))
+    .catch((err) => {
+        res.statusCode = 400; // Bad Request
+        res.setHeader('Content-Type', 'application/text');
+        res.send('Coudn\'t find the item.');
+    });
+},(err) => next(err))
+// 1. Users should be able to add a new item
 .post(
     // itemName's length should be in between 0 to 20 (It can't be empty)
     body('itemName')
         .isString().withMessage('itemName should be string') // condition of type
-        /* **************************************** */
-        // notEmpty() can be used here
-        /* **************************************** */
         .not().isEmpty().withMessage('itemName should not be empty') // condition of empty
         .trim() // will remove whitespace from both ends (start & end)
         .isLength({min: 1, max: 20}).withMessage('itemName\'s length should be in between 1 to 20') // condition of minimum and maximum characters for itemName
@@ -38,12 +40,6 @@ indexRouter.route('/')
             });
         }),
     body('dateAdded')
-        //---------------------------------------------------------//
-        // issue with date format access /\/ RESOLVED/FIXED /\/
-        // Reference, Object Embedded
-        // db.zips.find(query, {})
-        // BSON & Update a document without set
-        //---------------------------------------------------------//
         .custom(value => {
             var date = Date.parse(value);
             if(isNaN(date)) // given value string is not a proper date object
@@ -72,14 +68,6 @@ indexRouter.route('/')
                 return Promise.resolve('successfull');
         }),
     (req,res,next) => {
-    /* REQUEST STRUCTURE:
-        {
-            "itemName": "Tesla Cars Stock",
-            "date": "2021-01-16T07:25:04.310Z"
-            "currentStock": 1000,
-            "manufacturingCompany": "Tesla"
-        }
-    */
 
     // Always prefer to write arrow functions instead to actual function
      createItemWithDateInItemsCollection = async (request) => {
@@ -116,12 +104,8 @@ indexRouter.route('/')
         createItemWithDateInItemsCollection(req);        
     }
 }, (err) => next(err))
-.put((req, res, next) => {
-    res.statusCode = 400;
-    res.setHeader('Content-Type', 'application/text');
-    res.send('PUT IS INVALID');
-}, (err) => next(err))
-.delete(
+// 2. Users should be able to edit an existing item
+.put(
     body('_id')
         .not().isEmpty().withMessage('_id field should not be empty')
         .custom( value => {
@@ -134,46 +118,27 @@ indexRouter.route('/')
             {
                 return Promise.resolve('Successfull'); 
             }
-        }),
-    (req, res, next) => {
-    // path param & query param TODO
-
-    deleteItemInItemsCollection = async (request) => {
-        await ITEMS.deleteOne({"_id": request._id})
-            .then((item) => {
-                if(item == null)
-                {
-                    next(err);
-                    return;
-                }
-                res.statusCode = 200; // Successfull
+        }),(req, res, next) => {
+            ITEMS.updateOne({"_id": req.body._id}, {"$set": req.query})
+            .then(item => {
+                res.statusCode = 200; // Successfull creation of item in db
                 res.setHeader('Content-Type', 'application/text');
-                res.send('Successfully deleted'); 
-            }, (err) => next(err))
-            .catch((err) => {
-                res.statusCode = 400; // Bad Request
-                res.setHeader('Content-Type', 'application/text');
-                res.send('Id is not present in Collection');
+                res.send('Successfully updated!');
             })
-    }
-    const erros = validationResult(req); // all the errors in validations will be stored here
-    if(!erros.isEmpty())
-    {
-        res.statusCode = 404;
-        res.setHeader('Content-Type', 'application/text');
-        res.send('DELETE IS INVALID' + JSON.stringify(erros));
-    }
-    else
-    {
-        deleteItemInItemsCollection(req);
-    }
-}, (err) => console.log(err));
+            .catch((err) => {
+                // EDIT Forget
+                res.statusCode = 400;
+                res.setHeader('Content-Type', 'application/text');
+                res.send('Not able to fulfill request.');
+            })
+}, (err) => next(err))
 
 // /withoutDate sub-route for the POST (creation of item in db) wihout date
+// Sub part of 2. Users should be able to edit an existing item
 indexRouter.route('/withoutDate')
 .post(
-        // itemName's length should be in between 0 to 20 (It can't be empty)
-        body('itemName')
+    // itemName's length should be in between 0 to 20 (It can't be empty)
+    body('itemName')
         .isString().withMessage('itemName should be string') // condition of type
         .not().isEmpty().withMessage('itemName should not be empty') // condition of empty
         .trim() // will remove whitespace from both ends (start & end)
@@ -226,15 +191,15 @@ indexRouter.route('/withoutDate')
     createItemWithOutDateInItemsCollection(req); 
 }, (err) => console.log(err));
 
-indexRouter.route('/increaseStocks')
+// 7. Users should be able to view all the details of any particular item.
+indexRouter.route('/:id')
 .get(
-    body('_id')
-    .not().isEmpty().withMessage('_id field should not be empty')
+    param('id')
     .custom( value => {
         // checking weather given object id is valid ObjectId or not?
         if(! mongoose.isValidObjectId(value))
         {
-            return Promise.reject('_id should be a valid ObjectId');
+            return Promise.reject('id should be a valid ObjectId');
         }
         else
         {
@@ -259,13 +224,14 @@ indexRouter.route('/increaseStocks')
             res.setHeader('Content-Type', 'application/json');
             res.json(item); // response
         })
-        .catch((err) => console.log(err)); 
-    }
+        .catch((err) => next(err)); 
+    },
+    (err) => next(err)
 )
-
-.post(
-    body('_id')
-        .not().isEmpty().withMessage('_id field should not be empty')
+// 6. Users should be able to increment and decrement the stock of any particular item.
+.put(
+    param('id')
+        .not().isEmpty().withMessage('id parameter should not be empty')
         .custom( value => {
             // checking weather given object id is valid ObjectId or not?
             if(! mongoose.isValidObjectId(value))
@@ -288,6 +254,26 @@ indexRouter.route('/increaseStocks')
                 }
             });
         }),
+    param('itemName')
+        .custom(value => {
+            if(value != null)
+            {
+                return ITEMS.findOne({"itemName": value}).then(item => {
+                    if(item){
+                        return Promise.reject('Item Name already exits, choose other item name!'); // Reject the creation of item that exits in database
+                    }
+                    else
+                    {
+                        return Promise.resolve('Successfull');
+                    }
+                })
+                .catch((err) => Promise.reject('Bad Request!'));
+            }
+            else
+            {
+                return Promise.resolve('ItemName is not provided by use!')
+            }
+        }),
     (req,res,next) => {
         ITEMS.updateOne({"_id": req.body._id}, {"$inc": {"currentStock": 1}})
         .then((item) => {
@@ -295,8 +281,96 @@ indexRouter.route('/increaseStocks')
             res.setHeader('Content-Type', 'application/text');
             res.send('currentStock has been updated'); // response
         })
-        .catch((err) => console.log(err)); 
+        .catch((err) => {
+            res.statusCode = 400; // Bad Request
+            res.setHeader('Content-Type', 'appication/text');
+            res.send('Bad request!')
+        }); 
+}, (err) => console.log(err))
+// 4. User should be able to delete any particular item
+.delete(
+    param('id')
+        .not().isEmpty().withMessage('_id field should not be empty')
+        .custom( value => {
+            // checking weather given object id is valid ObjectId or not?
+            if(! mongoose.isValidObjectId(value))
+            {
+                return Promise.reject('_id should be a valid ObjectId');
+            }
+            else
+            {
+                return Promise.resolve('Successfull'); 
+            }
+        }),
+    (req, res, next) => {
+    // path param & query param TODO
+
+    deleteItemInItemsCollection = async (request) => {
+        await ITEMS.deleteOne({"_id": req.params.id})
+            .then((item) => {
+                if(item == null)
+                {
+                    next(err);
+                    return;
+                }
+                res.statusCode = 200; // Successfull
+                res.setHeader('Content-Type', 'application/text');
+                res.send('Successfully deleted'); 
+            }, (err) => next(err))
+            .catch((err) => {
+                res.statusCode = 400; // Bad Request
+                res.setHeader('Content-Type', 'application/text');
+                res.send('Id is not present in Collection');
+            })
+    }
+    const erros = validationResult(req); // all the errors in validations will be stored here
+    if(!erros.isEmpty())
+    {
+        res.statusCode = 404;
+        res.setHeader('Content-Type', 'application/text');
+        res.send('DELETE IS INVALID' + JSON.stringify(erros));
+    }
+    else
+    {
+        deleteItemInItemsCollection(req);
+    }
 }, (err) => console.log(err));
 
-
+// 5. Users should be able to check the stock of any particular item.
+indexRouter.route('/:id/currentStock')
+.get(
+    param('id')
+    .custom( value => {
+        // checking weather given object id is valid ObjectId or not?
+        if(! mongoose.isValidObjectId(value))
+        {
+            return Promise.reject('id should be a valid ObjectId');
+        }
+        else
+        {
+            return Promise.resolve('Successfull'); 
+        }
+    })
+    .custom(id => {
+        return ITEMS.findOne({"_id": id}).then(item => {
+            if(!item){
+                return Promise.reject('Id doesn\'t exit!'); // Reject the creation of item that exits in database
+            }
+            else
+            {
+                return Promise.resolve('Successfull');
+            }
+        });
+    }),
+    (req,res,next) => {
+        ITEMS.findOne({"_id": req.body._id})
+        .then((item) => {
+            res.statusCode = 200; // success
+            res.setHeader('Content-Type', 'application/text');
+            res.send(Number(item.currentStock)); // response
+        })
+        .catch((err) => next(err)); 
+    },
+    (err) => next(err)
+)
 module.exports = indexRouter;

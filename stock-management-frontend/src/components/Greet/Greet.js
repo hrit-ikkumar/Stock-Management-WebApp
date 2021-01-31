@@ -1,7 +1,10 @@
-import React, {Component} from 'react';
+import React from 'react';
 import './index.css';
 
 const Greet = () => {
+    /*
+    <div id="greet-conent" className=""> <h1></h1> </div>
+    */
     return React.createElement(
         'div', 
         {

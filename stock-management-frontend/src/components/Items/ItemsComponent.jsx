@@ -13,7 +13,9 @@ class Items extends Component{
         this.state = {
             selectedItem: null
         };
-        // console.log("constructor called!");
+        console.log("constructor called!");
+        //this.onSelectedItem = this.onSelectedItem.bind(this) // binding in class constructor
+        // above approach is better because binding will be done once
     }
 
     /*
@@ -28,23 +30,51 @@ class Items extends Component{
 
     /* onSelectedItem function for keeping track of selected item in given items */
     onSelectedItem(item){
-        this.setState({selectedItem: item});
+        // setState is async function if you want to run the code in sync way you can pass callback function
+        this.setState({selectedItem: item},
+            () => console.log(this.state.selectedItem));
+        /*
+        this.setState((prevState, props) => ({
+            selectedItem: prevState.selectedItem
+        }))
+        */
+        console.log(this.state.selectedItem);
     }
+    /*
+    arrow function way
+    onSelected = (item) => {
+
+    }
+    */
 
     componentDidMount(){
-        // console.log("componentDidMount called!");
+        console.log("componentDidMount called!");
     }
     componentDidUpdate(){
-        // console.log("componentDidUpdate called!");
+        console.log("componentDidUpdate called!");
+    }
+    componentWillMount(){
+        console.log("ComponentWillMount called")
     }
 
     render(){
-        // console.log("render called!");
+        // Destructuring of props & states
+        // means exposing the attributes inside properties
+        // const {itemName, itemDetail} = this.props // in case of class component
+        // const {itemName, itemDetail} = props // in case of functional component
+        // const {state1, state2} = this.state // only case of class component
+
+        console.log("render called!");
         // items element for every item & map for iterating each element in the array of js objects
         const items = this.props.items.map((item) =>{
             return(
                 <div className="col-11 col-md-5 m-2">
+                {/* if we don't use arrow function then we have to use
+                    something like:
+                    onClick={this.onSelectedItem} // and for binding this.onSelectedItem.bind(this)
+                    onClick={() => this.onSelectedItem()} */}
                     <Card outline key={item.id}
+                        
                         onClick={() => this.onSelectedItem(item.id)}>
 
                         {/* Card title name */}

@@ -1,0 +1,8 @@
+{
+	"system": "linux",
+	"executablePath": "/usr/bin/google-chrome",
+	"localhost": "localhost:3000",
+	"headless_browser": false,
+	"headless_embedded": true,
+	"reactTheme": "dark"
+}

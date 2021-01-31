@@ -14,29 +14,33 @@ var bodyParser = require('body-parser'); // body parser
 
 var _require = require('express-validator'),
     body = _require.body,
-    validationResult = _require.validationResult; // express-validator module for validations
+    validationResult = _require.validationResult,
+    query = _require.query,
+    param = _require.param; // express-validator module for validations
 
 
 var indexRouter = express.Router();
 indexRouter.use(bodyParser.json()); // body parser for http body into json object
 
-indexRouter.route('/').get(function (req, res, next) {
+indexRouter.route('/') // 3. Users should be able to view all the items
+.get(function (req, res, next) {
   ITEMS.find(req.query).then(function (items) {
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
-    res.json(items); //console.log(JSON.stringify(items, null, 2)); // printing the items 
+    res.json(items);
   }, function (err) {
-    return next(err)["catch"](function (err) {
-      return next(err);
-    });
+    return next(err);
+  })["catch"](function (err) {
+    res.statusCode = 400; // Bad Request
+
+    res.setHeader('Content-Type', 'application/text');
+    res.send('Coudn\'t find the item.');
   });
-}).post( // itemName's length should be in between 0 to 20 (It can't be empty)
+}, function (err) {
+  return next(err);
+}) // 1. Users should be able to add a new item
+.post( // itemName's length should be in between 0 to 20 (It can't be empty)
 body('itemName').isString().withMessage('itemName should be string') // condition of type
-
-/* **************************************** */
-// notEmpty() can be used here
-
-/* **************************************** */
 .not().isEmpty().withMessage('itemName should not be empty') // condition of empty
 .trim() // will remove whitespace from both ends (start & end)
 .isLength({
@@ -52,13 +56,7 @@ body('itemName').isString().withMessage('itemName should be string') // conditio
       return Promise.reject('Item Name already exits!'); // Reject the creation of item that exits in database
     }
   });
-}), body('dateAdded') //---------------------------------------------------------//
-// issue with date format access /\/ RESOLVED/FIXED /\/
-// Reference, Object Embedded
-// db.zips.find(query, {})
-// BSON & Update a document without set
-//---------------------------------------------------------//
-.custom(function (value) {
+}), body('dateAdded').custom(function (value) {
   var date = Date.parse(value);
 
   if (isNaN(date)) // given value string is not a proper date object
@@ -76,14 +74,6 @@ body('itemName').isString().withMessage('itemName should be string') // conditio
   // custom validation that value should not be negative
   if (value < 0) return Promise.reject('currentStock should not be negative');else return Promise.resolve('successfull');
 }), function (req, res, next) {
-  /* REQUEST STRUCTURE:
-      {
-          "itemName": "Tesla Cars Stock",
-          "date": "2021-01-16T07:25:04.310Z"
-          "currentStock": 1000,
-          "manufacturingCompany": "Tesla"
-      }
-  */
   // Always prefer to write arrow functions instead to actual function
   createItemWithDateInItemsCollection = function createItemWithDateInItemsCollection(request) {
     return regeneratorRuntime.async(function createItemWithDateInItemsCollection$(_context) {
@@ -132,13 +122,8 @@ body('itemName').isString().withMessage('itemName should be string') // conditio
     }
 }, function (err) {
   return next(err);
-}).put(function (req, res, next) {
-  res.statusCode = 400;
-  res.setHeader('Content-Type', 'application/text');
-  res.send('PUT IS INVALID');
-}, function (err) {
-  return next(err);
-})["delete"](body('_id').not().isEmpty().withMessage('_id field should not be empty').custom(function (value) {
+}) // 2. Users should be able to edit an existing item
+.put(body('_id').not().isEmpty().withMessage('_id field should not be empty').custom(function (value) {
   // checking weather given object id is valid ObjectId or not?
   if (!mongoose.isValidObjectId(value)) {
     return Promise.reject('_id should be a valid ObjectId');
@@ -146,54 +131,25 @@ body('itemName').isString().withMessage('itemName should be string') // conditio
     return Promise.resolve('Successfull');
   }
 }), function (req, res, next) {
-  // path param & query param TODO
-  deleteItemInItemsCollection = function deleteItemInItemsCollection(request) {
-    return regeneratorRuntime.async(function deleteItemInItemsCollection$(_context2) {
-      while (1) {
-        switch (_context2.prev = _context2.next) {
-          case 0:
-            _context2.next = 2;
-            return regeneratorRuntime.awrap(ITEMS.deleteOne({
-              "_id": request._id
-            }).then(function (item) {
-              if (item == null) {
-                next(err);
-                return;
-              }
+  ITEMS.updateOne({
+    "_id": req.body._id
+  }, {
+    "$set": req.query
+  }).then(function (item) {
+    res.statusCode = 200; // Successfull creation of item in db
 
-              res.statusCode = 200; // Successfull
-
-              res.setHeader('Content-Type', 'application/text');
-              res.send('Successfully deleted');
-            }, function (err) {
-              return next(err);
-            })["catch"](function (err) {
-              res.statusCode = 400; // Bad Request
-
-              res.setHeader('Content-Type', 'application/text');
-              res.send('Id is not present in Collection');
-            }));
-
-          case 2:
-          case "end":
-            return _context2.stop();
-        }
-      }
-    });
-  };
-
-  var erros = validationResult(req); // all the errors in validations will be stored here
-
-  if (!erros.isEmpty()) {
-    res.statusCode = 404;
     res.setHeader('Content-Type', 'application/text');
-    res.send('DELETE IS INVALID' + JSON.stringify(erros));
-  } else {
-    deleteItemInItemsCollection(req);
-  }
+    res.send('Successfully updated!');
+  })["catch"](function (err) {
+    // EDIT Forget
+    res.statusCode = 400;
+    res.setHeader('Content-Type', 'application/text');
+    res.send('Not able to fulfill request.');
+  });
 }, function (err) {
-  return console.log(err);
+  return next(err);
 }); // /withoutDate sub-route for the POST (creation of item in db) wihout date
+// Sub part of 2. Users should be able to edit an existing item
 
 indexRouter.route('/withoutDate').post( // itemName's length should be in between 0 to 20 (It can't be empty)
 body('itemName').isString().withMessage('itemName should be string') // condition of type
@@ -245,11 +201,12 @@ body('itemName').isString().withMessage('itemName should be string') // conditio
   createItemWithOutDateInItemsCollection(req);
 }, function (err) {
   return console.log(err);
-});
-indexRouter.route('/increaseStocks').get(body('_id').not().isEmpty().withMessage('_id field should not be empty').custom(function (value) {
+}); // 7. Users should be able to view all the details of any particular item.
+
+indexRouter.route('/:id').get(param('id').custom(function (value) {
   // checking weather given object id is valid ObjectId or not?
   if (!mongoose.isValidObjectId(value)) {
-    return Promise.reject('_id should be a valid ObjectId');
+    return Promise.reject('id should be a valid ObjectId');
   } else {
     return Promise.resolve('Successfull');
   }
@@ -272,9 +229,12 @@ indexRouter.route('/increaseStocks').get(body('_id').not().isEmpty().withMessage
     res.setHeader('Content-Type', 'application/json');
     res.json(item); // response
   })["catch"](function (err) {
-    return console.log(err);
+    return next(err);
   });
-}).post(body('_id').not().isEmpty().withMessage('_id field should not be empty').custom(function (value) {
+}, function (err) {
+  return next(err);
+}) // 6. Users should be able to increment and decrement the stock of any particular item.
+.put(param('id').not().isEmpty().withMessage('id parameter should not be empty').custom(function (value) {
   // checking weather given object id is valid ObjectId or not?
   if (!mongoose.isValidObjectId(value)) {
     return Promise.reject('_id should be a valid ObjectId');
@@ -291,6 +251,22 @@ indexRouter.route('/increaseStocks').get(body('_id').not().isEmpty().withMessage
       return Promise.resolve('Successfull');
     }
   });
+}), param('itemName').custom(function (value) {
+  if (value != null) {
+    return ITEMS.findOne({
+      "itemName": value
+    }).then(function (item) {
+      if (item) {
+        return Promise.reject('Item Name already exits, choose other item name!'); // Reject the creation of item that exits in database
+      } else {
+        return Promise.resolve('Successfull');
+      }
+    })["catch"](function (err) {
+      return Promise.reject('Bad Request!');
+    });
+  } else {
+    return Promise.resolve('ItemName is not provided by use!');
+  }
 }), function (req, res, next) {
   ITEMS.updateOne({
     "_id": req.body._id
@@ -304,9 +280,100 @@ indexRouter.route('/increaseStocks').get(body('_id').not().isEmpty().withMessage
     res.setHeader('Content-Type', 'application/text');
     res.send('currentStock has been updated'); // response
   })["catch"](function (err) {
-    return console.log(err);
+    res.statusCode = 400; // Bad Request
+
+    res.setHeader('Content-Type', 'appication/text');
+    res.send('Bad request!');
   });
 }, function (err) {
   return console.log(err);
+}) // 4. User should be able to delete any particular item
+["delete"](param('id').not().isEmpty().withMessage('_id field should not be empty').custom(function (value) {
+  // checking weather given object id is valid ObjectId or not?
+  if (!mongoose.isValidObjectId(value)) {
+    return Promise.reject('_id should be a valid ObjectId');
+  } else {
+    return Promise.resolve('Successfull');
+  }
+}), function (req, res, next) {
+  // path param & query param TODO
+  deleteItemInItemsCollection = function deleteItemInItemsCollection(request) {
+    return regeneratorRuntime.async(function deleteItemInItemsCollection$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            _context2.next = 2;
+            return regeneratorRuntime.awrap(ITEMS.deleteOne({
+              "_id": req.params.id
+            }).then(function (item) {
+              if (item == null) {
+                next(err);
+                return;
+              }
+
+              res.statusCode = 200; // Successfull
+
+              res.setHeader('Content-Type', 'application/text');
+              res.send('Successfully deleted');
+            }, function (err) {
+              return next(err);
+            })["catch"](function (err) {
+              res.statusCode = 400; // Bad Request
+
+              res.setHeader('Content-Type', 'application/text');
+              res.send('Id is not present in Collection');
+            }));
+
+          case 2:
+          case "end":
+            return _context2.stop();
+        }
+      }
+    });
+  };
+
+  var erros = validationResult(req); // all the errors in validations will be stored here
+
+  if (!erros.isEmpty()) {
+    res.statusCode = 404;
+    res.setHeader('Content-Type', 'application/text');
+    res.send('DELETE IS INVALID' + JSON.stringify(erros));
+  } else {
+    deleteItemInItemsCollection(req);
+  }
+}, function (err) {
+  return console.log(err);
+}); // 5. Users should be able to check the stock of any particular item.
+
+indexRouter.route('/:id/currentStock').get(param('id').custom(function (value) {
+  // checking weather given object id is valid ObjectId or not?
+  if (!mongoose.isValidObjectId(value)) {
+    return Promise.reject('id should be a valid ObjectId');
+  } else {
+    return Promise.resolve('Successfull');
+  }
+}).custom(function (id) {
+  return ITEMS.findOne({
+    "_id": id
+  }).then(function (item) {
+    if (!item) {
+      return Promise.reject('Id doesn\'t exit!'); // Reject the creation of item that exits in database
+    } else {
+      return Promise.resolve('Successfull');
+    }
+  });
+}), function (req, res, next) {
+  ITEMS.findOne({
+    "_id": req.body._id
+  }).then(function (item) {
+    res.statusCode = 200; // success
+
+    res.setHeader('Content-Type', 'application/text');
+    res.send(Number(item.currentStock)); // response
+  })["catch"](function (err) {
+    return next(err);
+  });
+}, function (err) {
+  return next(err);
 });
 module.exports = indexRouter;
