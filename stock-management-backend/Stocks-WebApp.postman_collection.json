@@ -1,0 +1,204 @@
+{
+	"info": {
+		"_postman_id": "0192d70f-da51-4eaa-ab05-f85c6a7399ce",
+		"name": "Stocks-WebApp",
+		"description": "Stock Managment Web App Testing.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. User should be able to create item in db. (With Date)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"dateAdded\": \"2021-01-22T08:49:34.081Z\",\n\t\"currentStock\": 45,\n\t\"itemName\": \"MATCH Stocks\",\n\t\"manufacturingCompany\": \"Match Company\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/itemRouter",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"itemRouter"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "1. User should be able to create item in db. (Without Date)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"currentStock\": 45,\n\t\"dateAdded\": \"2021-01-22T08:49:34.081Z\",\n\t\"itemName\": \"MATCH Felow\",\n\t\"manufacturingCompany\": \"Match Company\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/itemRouter/withoutDate",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"itemRouter",
+						"withoutDate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2. User should be able to edit the item in db.",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"_id\": \"600a920083ad432a495fcf7d\", \"itemName\": \"Karim Ding\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/itemRouter",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"itemRouter"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3. User should be able to view all the items in db.",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/itemRouter",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"itemRouter"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4. User should be able to delete an item in db (Using Params)",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/itemRouter/600a921283ad432a495fcf7e",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"itemRouter",
+						"600a921283ad432a495fcf7e"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "5. Users should be able to check the stock of any particular item.",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/itemRouter/600bc7125f023857446e9f3a/currentStock",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"itemRouter",
+						"600bc7125f023857446e9f3a",
+						"currentStock"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "6. User should be able to increment or Decrement the value of stock.",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"changeBy\":34365\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/itemRouter/600bc7125f023857446e9f3a",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"itemRouter",
+						"600bc7125f023857446e9f3a"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "7. User should be able to view all the details of particular item",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/itemRouter/600bc7125f023857446e9f3a",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"itemRouter",
+						"600bc7125f023857446e9f3a"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
