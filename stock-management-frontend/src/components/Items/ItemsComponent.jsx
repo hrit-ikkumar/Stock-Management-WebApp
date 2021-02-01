@@ -1,7 +1,12 @@
 import React, {Component} from 'react';
-import {Card, CardBody, 
-    CardTitle, Button, ButtonGroup } from 'reactstrap';
-
+import Button from '@material-ui/core/Button';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
+import SaveIcon from '@material-ui/icons/Save'
+import DeleteIcon from '@material-ui/icons/Delete';
+import InfoIcon from '@material-ui/icons/Info';
+import './index.css';
+import Info from '@material-ui/icons/Info';
+import { Checkbox } from '@material-ui/core';
 class Items extends Component{
 
     /* Constructor to get values from App.js */
@@ -68,53 +73,43 @@ class Items extends Component{
         // items element for every item & map for iterating each element in the array of js objects
         const items = this.props.items.map((item) =>{
             return(
-                <div className="col-11 col-md-5 m-2">
+                <div className="items">
                 {/* if we don't use arrow function then we have to use
                     something like:
                     onClick={this.onSelectedItem} // and for binding this.onSelectedItem.bind(this)
                     onClick={() => this.onSelectedItem()} */}
-                    <Card outline key={item.id}
-                        
+                    <div outline key={item.id}
                         onClick={() => this.onSelectedItem(item.id)}>
-
-                        {/* Card title name */}
-                        <CardTitle>{item.itemName}</CardTitle>
-
-                        {/* Card Body Part */}
-                        <CardBody>
-                            <ul>
-                                <li>Date: {item.dateOnAdded}</li>
-                                <li>Stock: {item.currentStock}</li>
-                                <li>Company: {item.manufacturingCompany}</li>
-                            </ul>
-                        </CardBody>
-                    </Card>
+                        <Checkbox disabled>
+                            Item
+                        </Checkbox>
+                        <ButtonGroup
+                            variant="contained">
+                            <Button
+                                startIcon={<SaveIcon />}
+                                color="primary">
+                                Edit
+                            </Button>
+                            <Button
+                                startIcon={<Info />}
+                                color="secondary">
+                                View
+                            </Button>
+                            <Button
+                                startIcon={<DeleteIcon />}
+                                color="yellow">
+                                Delete
+                            </Button>
+                        </ButtonGroup>
+                    </div>
                 </div>
             );
         });
 
         return(
-            <div>
-                <div className="container mt-5">
-                    {/* Create Item Button */}
-                    <div className="row">
-                        <ButtonGroup>
-                            <Button outline color="success">
-                                <h4>
-                                    <img src="https://img.icons8.com/bubbles/60/000000/create-new.png" 
-                                    alt="Create Item"/>
-                                </h4>
-                            </Button>
-                        </ButtonGroup>
-                    </div>
-
-                    {/* Previously created items are here */}
-                    <div className="row mt-3">
-                        {items}
-                    </div>
-                </div>
+            <div className="itemContainer">
+                {items}
             </div>
-
         );
     }
 }

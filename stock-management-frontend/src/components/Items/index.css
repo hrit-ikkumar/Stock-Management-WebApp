@@ -1,0 +1,14 @@
+.itemContainer {
+    text-align: center;
+    justify-content: center;
+    margin: 10% 30%;
+    border: 3px solid black;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.items{
+    justify-content: center;
+    margin: 3%;
+}
