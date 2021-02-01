@@ -3,7 +3,6 @@ import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import SaveIcon from '@material-ui/icons/Save'
 import DeleteIcon from '@material-ui/icons/Delete';
-import InfoIcon from '@material-ui/icons/Info';
 import './index.css';
 import Info from '@material-ui/icons/Info';
 import { Checkbox } from '@material-ui/core';
