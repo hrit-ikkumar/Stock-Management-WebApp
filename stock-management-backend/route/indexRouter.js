@@ -5,7 +5,6 @@ const bodyParser = require('body-parser'); // body parser
 const { body, validationResult,query, param } = require('express-validator'); // express-validator module for validations
 
 const indexRouter = express.Router();
-
 indexRouter.use(bodyParser.json()); // body parser for http body into json object
 
 indexRouter.route('/')
@@ -72,6 +71,7 @@ indexRouter.route('/')
     // Always prefer to write arrow functions instead to actual function
      createItemWithDateInItemsCollection = async (request) => {
         await ITEMS.create({
+            _id: new mongoose.Types.ObjectId(),
             itemName: request.body.itemName,
             dateAdded: request.body.dateAdded,
             currentStock: request.body.currentStock,
@@ -172,6 +172,7 @@ indexRouter.route('/withoutDate')
     (req,res,next) => {
     createItemWithOutDateInItemsCollection = (request) => {
         ITEMS.create({
+            _id: new mongoose.Types.ObjectId(),
             itemName: request.body.itemName,
             dateAdded: new Date(),
             currentStock: request.body.currentStock,
@@ -188,7 +189,17 @@ indexRouter.route('/withoutDate')
             res.send('ERROR INVALID');
         });
     }
-    createItemWithOutDateInItemsCollection(req); 
+    const errors = validationResult(req);
+    if(!errors.isEmpty())
+    {
+        res.statusCode = 400; // Bad Request
+        res.setHeader('Content-Type', 'application/text');
+        res.send('Invalid POST Request' + JSON.stringify(errors));
+    }
+    else
+    {
+        createItemWithOutDateInItemsCollection(req); 
+    }
 }, (err) => console.log(err));
 
 // 7. Users should be able to view all the details of any particular item.
@@ -218,13 +229,27 @@ indexRouter.route('/:id')
         });
     }),
     (req,res,next) => {
-        ITEMS.findOne({"_id": req.body._id})
-        .then((item) => {
-            res.statusCode = 200; // success
-            res.setHeader('Content-Type', 'application/json');
-            res.json(item); // response
-        })
-        .catch((err) => next(err)); 
+        const errors = validationResult(req);
+        if(!errors.isEmpty())
+        {
+            res.statusCode = 400; // Bad Request
+            res.setHeader('Content-Type', 'application/text');
+            res.send("Invalid GET Request: " + JSON.stringify(errors));
+        }
+        else
+        {
+            ITEMS.findOne({"_id": req.params.id})
+            .then((item) => {
+                res.statusCode = 200; // success
+                res.setHeader('Content-Type', 'application/json');
+                res.json(item); // response
+            },(err) => next(err))
+            .catch((err) => {
+                res.statusCode = 400;
+                res.setHeader('Content-Type', 'application/text');
+                res.send('Invalid GET Request')
+            }); 
+        }
     },
     (err) => next(err)
 )
@@ -232,9 +257,9 @@ indexRouter.route('/:id')
 .put(
     param('id')
         .not().isEmpty().withMessage('id parameter should not be empty')
-        .custom( value => {
+        .custom( id => {
             // checking weather given object id is valid ObjectId or not?
-            if(! mongoose.isValidObjectId(value))
+            if(! mongoose.isValidObjectId(id))
             {
                 return Promise.reject('_id should be a valid ObjectId');
             }
@@ -254,38 +279,39 @@ indexRouter.route('/:id')
                 }
             });
         }),
-    param('itemName')
-        .custom(value => {
-            if(value != null)
+    body('changeBy')
+        .custom(changeBy => {
+            if(typeof(changeBy) !== 'number')
             {
-                return ITEMS.findOne({"itemName": value}).then(item => {
-                    if(item){
-                        return Promise.reject('Item Name already exits, choose other item name!'); // Reject the creation of item that exits in database
-                    }
-                    else
-                    {
-                        return Promise.resolve('Successfull');
-                    }
-                })
-                .catch((err) => Promise.reject('Bad Request!'));
+                return Promise.reject('changeBy should be number');
             }
             else
             {
-                return Promise.resolve('ItemName is not provided by use!')
+                return Promise.resolve('Successfull');
             }
         }),
     (req,res,next) => {
-        ITEMS.updateOne({"_id": req.body._id}, {"$inc": {"currentStock": 1}})
-        .then((item) => {
-            res.statusCode = 200; // success
-            res.setHeader('Content-Type', 'application/text');
-            res.send('currentStock has been updated'); // response
-        })
-        .catch((err) => {
+        const errors = validationResult(req);
+        if(!errors.isEmpty())
+        {
             res.statusCode = 400; // Bad Request
-            res.setHeader('Content-Type', 'appication/text');
-            res.send('Bad request!')
-        }); 
+            res.setHeader('Content-Type', 'application/text');
+            res.send('INVALID PUT REQUEST: ' + JSON.stringify(errors));
+        }
+        else
+        {
+            ITEMS.updateOne({"_id": req.params.id}, {"$inc": {"currentStock": req.body.changeBy}})
+            .then((item) => {
+                res.statusCode = 200; // success
+                res.setHeader('Content-Type', 'application/text');
+                res.send('currentStock has been updated'); // response
+            })
+            .catch((err) => {
+                res.statusCode = 400; // Bad Request
+                res.setHeader('Content-Type', 'appication/text');
+                res.send('Bad request!')
+            }); 
+        }
 }, (err) => console.log(err))
 // 4. User should be able to delete any particular item
 .delete(
@@ -308,14 +334,18 @@ indexRouter.route('/:id')
     deleteItemInItemsCollection = async (request) => {
         await ITEMS.deleteOne({"_id": req.params.id})
             .then((item) => {
-                if(item == null)
+                if(item.deletedCount == 0)
                 {
-                    next(err);
-                    return;
+                    res.statusCode = 400; // Bad Request No deletion is made
+                    res.setHeader('Content-Type', 'application/text');
+                    res.send('Unable to delete item. Please check id!');
                 }
-                res.statusCode = 200; // Successfull
-                res.setHeader('Content-Type', 'application/text');
-                res.send('Successfully deleted'); 
+                else
+                {
+                    res.statusCode = 200; // Successfull
+                    res.setHeader('Content-Type', 'application/text');
+                    res.send('Successfully deleted'); 
+                }
             }, (err) => next(err))
             .catch((err) => {
                 res.statusCode = 400; // Bad Request
@@ -340,9 +370,9 @@ indexRouter.route('/:id')
 indexRouter.route('/:id/currentStock')
 .get(
     param('id')
-    .custom( value => {
+    .custom( id => {
         // checking weather given object id is valid ObjectId or not?
-        if(! mongoose.isValidObjectId(value))
+        if(! mongoose.isValidObjectId(id))
         {
             return Promise.reject('id should be a valid ObjectId');
         }
@@ -350,27 +380,44 @@ indexRouter.route('/:id/currentStock')
         {
             return Promise.resolve('Successfull'); 
         }
-    })
-    .custom(id => {
-        return ITEMS.findOne({"_id": id}).then(item => {
-            if(!item){
-                return Promise.reject('Id doesn\'t exit!'); // Reject the creation of item that exits in database
-            }
-            else
-            {
-                return Promise.resolve('Successfull');
-            }
-        });
     }),
     (req,res,next) => {
-        ITEMS.findOne({"_id": req.body._id})
-        .then((item) => {
-            res.statusCode = 200; // success
+        const erros = validationResult(req); // all the errors in validations will be stored here
+        if(!erros.isEmpty())
+        {
+            res.statusCode = 400;
             res.setHeader('Content-Type', 'application/text');
-            res.send(Number(item.currentStock)); // response
-        })
-        .catch((err) => next(err)); 
+            res.send('DELETE IS INVALID' + JSON.stringify(erros));
+        }
+        else
+        {
+            ITEMS.findOne({"_id": req.params.id})
+            .then((item) => {
+                if(item == null)
+                {
+                    res.statusCode = 400; // Bad Request.
+                    res.setHeader('Content-Type', 'application/text');
+                    res.send('Please check id does not exist');
+                }
+                else
+                {
+                    let currentStockResponse = Number(item.currentStock);
+                    res.statusCode = 200; // success
+                    res.setHeader('Content-Type', 'application/number');
+                    //****************************************************************//
+                    // HOW CAN I SEND INTEGER TO CLIENT X GETTING ERROR FOR currentStockResponse
+                    //****************************************************************//
+                    res.send(currentStockResponse.toString()); // response
+                }
+            },(err) => next(err))
+            .catch((err) => {
+                console.log(err);
+                res.statusCode = 400;
+                res.setHeader('Content-Type', 'application/text');
+                res.send('Can not read given item\'s id');
+            });
+        }
     },
     (err) => next(err)
-)
+);
 module.exports = indexRouter;

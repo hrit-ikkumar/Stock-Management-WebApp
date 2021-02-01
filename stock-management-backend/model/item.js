@@ -2,6 +2,10 @@ var mongoose = require('mongoose'); // package import
 var Schema = mongoose.Schema; // Schema class
 
 var item = new Schema({
+    _id: {
+        type: Schema.Types.ObjectId,
+        required: true
+    },
     itemName: {
         type: String,
         required: true

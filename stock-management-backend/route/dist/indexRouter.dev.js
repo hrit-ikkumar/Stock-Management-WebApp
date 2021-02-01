@@ -82,6 +82,7 @@ body('itemName').isString().withMessage('itemName should be string') // conditio
           case 0:
             _context.next = 2;
             return regeneratorRuntime.awrap(ITEMS.create({
+              _id: new mongoose.Types.ObjectId(),
               itemName: request.body.itemName,
               dateAdded: request.body.dateAdded,
               currentStock: request.body.currentStock,
@@ -181,6 +182,7 @@ body('itemName').isString().withMessage('itemName should be string') // conditio
 }), function (req, res, next) {
   createItemWithOutDateInItemsCollection = function createItemWithOutDateInItemsCollection(request) {
     ITEMS.create({
+      _id: new mongoose.Types.ObjectId(),
       itemName: request.body.itemName,
       dateAdded: new Date(),
       currentStock: request.body.currentStock,
@@ -198,7 +200,16 @@ body('itemName').isString().withMessage('itemName should be string') // conditio
     });
   };
 
-  createItemWithOutDateInItemsCollection(req);
+  var errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    res.statusCode = 400; // Bad Request
+
+    res.setHeader('Content-Type', 'application/text');
+    res.send('Invalid POST Request' + JSON.stringify(errors));
+  } else {
+    createItemWithOutDateInItemsCollection(req);
+  }
 }, function (err) {
   return console.log(err);
 }); // 7. Users should be able to view all the details of any particular item.
@@ -221,22 +232,35 @@ indexRouter.route('/:id').get(param('id').custom(function (value) {
     }
   });
 }), function (req, res, next) {
-  ITEMS.findOne({
-    "_id": req.body._id
-  }).then(function (item) {
-    res.statusCode = 200; // success
+  var errors = validationResult(req);
 
-    res.setHeader('Content-Type', 'application/json');
-    res.json(item); // response
-  })["catch"](function (err) {
-    return next(err);
-  });
+  if (!errors.isEmpty()) {
+    res.statusCode = 400; // Bad Request
+
+    res.setHeader('Content-Type', 'application/text');
+    res.send("Invalid GET Request: " + JSON.stringify(errors));
+  } else {
+    ITEMS.findOne({
+      "_id": req.params.id
+    }).then(function (item) {
+      res.statusCode = 200; // success
+
+      res.setHeader('Content-Type', 'application/json');
+      res.json(item); // response
+    }, function (err) {
+      return next(err);
+    })["catch"](function (err) {
+      res.statusCode = 400;
+      res.setHeader('Content-Type', 'application/text');
+      res.send('Invalid GET Request');
+    });
+  }
 }, function (err) {
   return next(err);
 }) // 6. Users should be able to increment and decrement the stock of any particular item.
-.put(param('id').not().isEmpty().withMessage('id parameter should not be empty').custom(function (value) {
+.put(param('id').not().isEmpty().withMessage('id parameter should not be empty').custom(function (id) {
   // checking weather given object id is valid ObjectId or not?
-  if (!mongoose.isValidObjectId(value)) {
+  if (!mongoose.isValidObjectId(id)) {
     return Promise.reject('_id should be a valid ObjectId');
   } else {
     return Promise.resolve('Successfull');
@@ -251,40 +275,39 @@ indexRouter.route('/:id').get(param('id').custom(function (value) {
       return Promise.resolve('Successfull');
     }
   });
-}), param('itemName').custom(function (value) {
-  if (value != null) {
-    return ITEMS.findOne({
-      "itemName": value
-    }).then(function (item) {
-      if (item) {
-        return Promise.reject('Item Name already exits, choose other item name!'); // Reject the creation of item that exits in database
-      } else {
-        return Promise.resolve('Successfull');
-      }
-    })["catch"](function (err) {
-      return Promise.reject('Bad Request!');
-    });
+}), body('changeBy').custom(function (changeBy) {
+  if (typeof changeBy !== 'number') {
+    return Promise.reject('changeBy should be number');
   } else {
-    return Promise.resolve('ItemName is not provided by use!');
+    return Promise.resolve('Successfull');
   }
 }), function (req, res, next) {
-  ITEMS.updateOne({
-    "_id": req.body._id
-  }, {
-    "$inc": {
-      "currentStock": 1
-    }
-  }).then(function (item) {
-    res.statusCode = 200; // success
+  var errors = validationResult(req);
 
-    res.setHeader('Content-Type', 'application/text');
-    res.send('currentStock has been updated'); // response
-  })["catch"](function (err) {
+  if (!errors.isEmpty()) {
     res.statusCode = 400; // Bad Request
 
-    res.setHeader('Content-Type', 'appication/text');
-    res.send('Bad request!');
-  });
+    res.setHeader('Content-Type', 'application/text');
+    res.send('INVALID PUT REQUEST: ' + JSON.stringify(errors));
+  } else {
+    ITEMS.updateOne({
+      "_id": req.params.id
+    }, {
+      "$inc": {
+        "currentStock": req.body.changeBy
+      }
+    }).then(function (item) {
+      res.statusCode = 200; // success
+
+      res.setHeader('Content-Type', 'application/text');
+      res.send('currentStock has been updated'); // response
+    })["catch"](function (err) {
+      res.statusCode = 400; // Bad Request
+
+      res.setHeader('Content-Type', 'appication/text');
+      res.send('Bad request!');
+    });
+  }
 }, function (err) {
   return console.log(err);
 }) // 4. User should be able to delete any particular item
@@ -306,15 +329,17 @@ indexRouter.route('/:id').get(param('id').custom(function (value) {
             return regeneratorRuntime.awrap(ITEMS.deleteOne({
               "_id": req.params.id
             }).then(function (item) {
-              if (item == null) {
-                next(err);
-                return;
+              if (item.deletedCount == 0) {
+                res.statusCode = 400; // Bad Request No deletion is made
+
+                res.setHeader('Content-Type', 'application/text');
+                res.send('Unable to delete item. Please check id!');
+              } else {
+                res.statusCode = 200; // Successfull
+
+                res.setHeader('Content-Type', 'application/text');
+                res.send('Successfully deleted');
               }
-
-              res.statusCode = 200; // Successfull
-
-              res.setHeader('Content-Type', 'application/text');
-              res.send('Successfully deleted');
             }, function (err) {
               return next(err);
             })["catch"](function (err) {
@@ -345,34 +370,48 @@ indexRouter.route('/:id').get(param('id').custom(function (value) {
   return console.log(err);
 }); // 5. Users should be able to check the stock of any particular item.
 
-indexRouter.route('/:id/currentStock').get(param('id').custom(function (value) {
+indexRouter.route('/:id/currentStock').get(param('id').custom(function (id) {
   // checking weather given object id is valid ObjectId or not?
-  if (!mongoose.isValidObjectId(value)) {
+  if (!mongoose.isValidObjectId(id)) {
     return Promise.reject('id should be a valid ObjectId');
   } else {
     return Promise.resolve('Successfull');
   }
-}).custom(function (id) {
-  return ITEMS.findOne({
-    "_id": id
-  }).then(function (item) {
-    if (!item) {
-      return Promise.reject('Id doesn\'t exit!'); // Reject the creation of item that exits in database
-    } else {
-      return Promise.resolve('Successfull');
-    }
-  });
 }), function (req, res, next) {
-  ITEMS.findOne({
-    "_id": req.body._id
-  }).then(function (item) {
-    res.statusCode = 200; // success
+  var erros = validationResult(req); // all the errors in validations will be stored here
 
+  if (!erros.isEmpty()) {
+    res.statusCode = 400;
     res.setHeader('Content-Type', 'application/text');
-    res.send(Number(item.currentStock)); // response
-  })["catch"](function (err) {
-    return next(err);
-  });
+    res.send('DELETE IS INVALID' + JSON.stringify(erros));
+  } else {
+    ITEMS.findOne({
+      "_id": req.params.id
+    }).then(function (item) {
+      if (item == null) {
+        res.statusCode = 400; // Bad Request.
+
+        res.setHeader('Content-Type', 'application/text');
+        res.send('Please check id does not exist');
+      } else {
+        var currentStockResponse = Number(item.currentStock);
+        res.statusCode = 200; // success
+
+        res.setHeader('Content-Type', 'application/number'); //****************************************************************//
+        // HOW CAN I SEND INTEGER TO CLIENT X GETTING ERROR FOR currentStockResponse
+        //****************************************************************//
+
+        res.send(currentStockResponse.toString()); // response
+      }
+    }, function (err) {
+      return next(err);
+    })["catch"](function (err) {
+      console.log(err);
+      res.statusCode = 400;
+      res.setHeader('Content-Type', 'application/text');
+      res.send('Can not read given item\'s id');
+    });
+  }
 }, function (err) {
   return next(err);
 });
