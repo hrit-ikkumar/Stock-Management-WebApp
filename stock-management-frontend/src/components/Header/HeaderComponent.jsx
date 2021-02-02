@@ -7,13 +7,10 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
-
+import Container from '@material-ui/core/Container';
 const useStyles = makeStyles((theme) => ({
     root: {
       flexGrow: 1,
-    },
-    menuButton: {
-      marginRight: theme.spacing(2),
     },
     title: {
       flexGrow: 1,
@@ -23,16 +20,16 @@ const useStyles = makeStyles((theme) => ({
 const Header = () => {
     const classes = useStyles();
     return(
-        <div className={classes.root}>
-        <AppBar position="static">
-            <Toolbar>
-              {/* Header of application */}
-              <Typography variant="h6" className={classes.title}>
-                  Stock Management WebApp
-              </Typography>
-            </Toolbar>
-        </AppBar>
-        </div>
+        <Container className={classes.root}>
+          <AppBar position="fixed">
+              <Toolbar>
+                {/* Header of application */}
+                <Typography variant="h6" className={classes.title}>
+                    Stock Management WebApp
+                </Typography>
+              </Toolbar>
+          </AppBar>
+        </Container>
     );
 }
 

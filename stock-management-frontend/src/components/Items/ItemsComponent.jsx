@@ -3,9 +3,11 @@ import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import SaveIcon from '@material-ui/icons/Save'
 import DeleteIcon from '@material-ui/icons/Delete';
-import './index.css';
+import './index.css'; // custom css
 import Info from '@material-ui/icons/Info';
-import { Checkbox } from '@material-ui/core';
+import {Container } from '@material-ui/core';
+import Box from '@material-ui/core/Box';
+
 class Items extends Component{
 
     /* Constructor to get values from App.js */
@@ -79,9 +81,7 @@ class Items extends Component{
                     onClick={() => this.onSelectedItem()} */}
                     <div outline key={item.id}
                         onClick={() => this.onSelectedItem(item.id)}>
-                        <Checkbox disabled>
-                            Item
-                        </Checkbox>
+                        <h4 className="itemName">{item.itemName}</h4>
                         <ButtonGroup
                             variant="contained">
                             <Button
@@ -91,12 +91,12 @@ class Items extends Component{
                             </Button>
                             <Button
                                 startIcon={<Info />}
-                                color="secondary">
+                                color="success">
                                 View
                             </Button>
                             <Button
                                 startIcon={<DeleteIcon />}
-                                color="yellow">
+                                color="secondary">
                                 Delete
                             </Button>
                         </ButtonGroup>
@@ -106,9 +106,12 @@ class Items extends Component{
         });
 
         return(
-            <div className="itemContainer">
-                {items}
-            </div>
+            <Box marginTop={10}>
+                <Container maxWidth="xs" m={10}>
+                    {items}
+                </Container>
+            </Box>
+            
         );
     }
 }

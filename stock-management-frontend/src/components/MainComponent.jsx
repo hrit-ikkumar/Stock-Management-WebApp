@@ -19,8 +19,7 @@ class Main extends Component{
   render() {
     return(
       <div>
-        <Header />   
-        <Greet />     
+        <Header />    
           <Switch>
             {/*
               When I don't need to pass any props (arguments) to component
