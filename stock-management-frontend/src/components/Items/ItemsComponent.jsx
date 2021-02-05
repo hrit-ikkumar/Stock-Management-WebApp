@@ -1,12 +1,13 @@
 import React, {Component} from 'react';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
-import SaveIcon from '@material-ui/icons/Save'
+import SaveIcon from '@material-ui/icons/Save';
 import DeleteIcon from '@material-ui/icons/Delete';
 import './index.css'; // custom css
 import Info from '@material-ui/icons/Info';
-import {Container } from '@material-ui/core';
+import {Card, CardActions, CardContent, CardHeader, Container, makeStyles, Typography } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
+
 
 class Items extends Component{
 
@@ -23,16 +24,6 @@ class Items extends Component{
         //this.onSelectedItem = this.onSelectedItem.bind(this) // binding in class constructor
         // above approach is better because binding will be done once
     }
-
-    /*
-        Why I am not using function keyword because
-        class component has methods not the functions
-        they are binded together with state.
-        So, we don't need to use function keyword here.
-        if we are using functional component then we can 
-        use the function keyword to define the functions 
-        inside the functional component.
-    */
 
     /* onSelectedItem function for keeping track of selected item in given items */
     onSelectedItem(item){
@@ -64,50 +55,60 @@ class Items extends Component{
     }
 
     render(){
-        // Destructuring of props & states
-        // means exposing the attributes inside properties
-        // const {itemName, itemDetail} = this.props // in case of class component
-        // const {itemName, itemDetail} = props // in case of functional component
-        // const {state1, state2} = this.state // only case of class component
-
+        //const classes = userStyles();
         console.log("render called!");
         // items element for every item & map for iterating each element in the array of js objects
         const items = this.props.items.map((item) =>{
             return(
-                <div className="items">
-                {/* if we don't use arrow function then we have to use
-                    something like:
-                    onClick={this.onSelectedItem} // and for binding this.onSelectedItem.bind(this)
-                    onClick={() => this.onSelectedItem()} */}
-                    <div outline key={item.id}
-                        onClick={() => this.onSelectedItem(item.id)}>
-                        <h4 className="itemName">{item.itemName}</h4>
-                        <ButtonGroup
-                            variant="contained">
-                            <Button
-                                startIcon={<SaveIcon />}
-                                color="primary">
-                                Edit
-                            </Button>
-                            <Button
-                                startIcon={<Info />}
-                                color="success">
-                                View
-                            </Button>
-                            <Button
-                                startIcon={<DeleteIcon />}
-                                color="secondary">
-                                Delete
-                            </Button>
-                        </ButtonGroup>
-                    </div>
+                <div className="item">
+                    <Card
+                        style={{
+                            display:'block',
+                            color:'#f09503',    
+                            transitionDuration:'0.3s',
+                        }}
+                        outline variant="outlined" key={item.id}
+                        onClick={() => this.onSelectedItem(item.id)}
+                        >
+                        <CardHeader
+                            title={`${item.itemName}`}
+                            subheader={`Manufacturer: ${item.manufacturingCompany}`}
+                        />
+                        {/* <CardContent>
+                            
+                        </CardContent> */}
+                        <CardActions>
+                            <ButtonGroup
+                                orientation="horizontal"
+                                fullWidth="true"
+                                size="large">
+                                <Button
+                                    startIcon={<SaveIcon />}
+                                    color="primary">
+                                    Edit
+                                </Button>
+                                <Button
+                                    startIcon={<Info />}
+                                    color="success">
+                                    View
+                                </Button>
+                                <Button
+                                    startIcon={<DeleteIcon />}
+                                    color="secondary">
+                                    Delete
+                                </Button>
+                            </ButtonGroup>
+                        </CardActions>
+                    </Card>
+            
                 </div>
+
             );
         });
 
         return(
-            <Box marginTop={10}>
-                <Container maxWidth="xs" m={10}>
+            <Box paddingTop={7}>
+                <Container maxWidth="xs">
                     {items}
                 </Container>
             </Box>

@@ -1,3 +1,7 @@
 .footer{
-    background-color: darkturquoise;
+    background-color: #0c2095;
+    color: white;
+}
+.app {
+    background-color: rgb(4, 63, 151);
 }

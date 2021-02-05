@@ -4,7 +4,6 @@ import Footer from './Footer/FooterComponent';
 import Items from './Items/ItemsComponent';
 import {ITEMS} from '../shared/items';
 import {Switch, Route, Redirect} from 'react-router-dom';
-import Greet from './Greet/Greet';
 
 // Class Component
 class Main extends Component{

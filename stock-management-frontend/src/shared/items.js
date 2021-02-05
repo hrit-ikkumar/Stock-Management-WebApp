@@ -75,5 +75,5 @@ export const ITEMS = [
         dateOnAdded: '10/01/2021',
         currentStock: 500,
         manufacturingCompany: 'MyAnatomy'
-    }
+    }   
 ];

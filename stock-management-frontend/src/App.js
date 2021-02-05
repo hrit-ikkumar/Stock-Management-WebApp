@@ -7,11 +7,11 @@ class App extends Component{
   // presentational component only
   render() {
     return(
-      <BrowserRouter>
-        <div>
-          <Main/>
-        </div>
-      </BrowserRouter>
+      <div className="app">
+        <BrowserRouter>
+            <Main/>
+        </BrowserRouter>
+      </div>
     );
   }
 }
