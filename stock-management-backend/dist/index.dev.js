@@ -2,8 +2,10 @@
 
 var express = require('express');
 
+var cors = require('cors');
+
 var app = express();
-var port = 3000;
+var port = 3001;
 
 var indexRouter = require('./route/indexRouter');
 
@@ -22,6 +24,7 @@ connect.then(function (db) {
 }, function (err) {
   console.log(err);
 });
+app.use(cors());
 app.use('/itemRouter', indexRouter);
 app.listen(port, function () {
   console.log("Server is running at http://localhost:".concat(port));
