@@ -21,7 +21,7 @@ const Header = () => {
           <AppBar position="fixed">
               <Toolbar>
                 {/* Header of application */}
-                <Typography variant="h6" className={classes.title}>
+                <Typography variant="h4" className={classes.title}>
                     Stock Management WebApp
                 </Typography>
               </Toolbar>

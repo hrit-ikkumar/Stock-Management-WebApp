@@ -3,10 +3,12 @@ import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import SaveIcon from '@material-ui/icons/Save';
 import DeleteIcon from '@material-ui/icons/Delete';
+import AddIcon from '@material-ui/icons/Add';
 import './index.css'; // custom css
 import Info from '@material-ui/icons/Info';
 import {Card, CardActions, CardContent, CardHeader, Container, makeStyles, Typography } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
+import { ITEMS } from '../../shared/items';
 
 
 class Items extends Component{
@@ -18,8 +20,11 @@ class Items extends Component{
         
         // It's own state
         this.state = {
-            selectedItem: null
+            selectedItem: null,
+            isLoading: true,
+            items: null
         };
+        console.log(this.props.item);
         console.log("constructor called!");
         //this.onSelectedItem = this.onSelectedItem.bind(this) // binding in class constructor
         // above approach is better because binding will be done once
@@ -30,11 +35,7 @@ class Items extends Component{
         // setState is async function if you want to run the code in sync way you can pass callback function
         this.setState({selectedItem: item},
             () => console.log(this.state.selectedItem));
-        /*
-        this.setState((prevState, props) => ({
-            selectedItem: prevState.selectedItem
-        }))
-        */
+
         console.log(this.state.selectedItem);
     }
     /*
@@ -47,24 +48,44 @@ class Items extends Component{
     componentDidMount(){
         console.log("componentDidMount called!");
     }
-    componentDidUpdate(){
+    componentDidUpdate (){
         console.log("componentDidUpdate called!");
     }
-    componentWillMount(){
-        console.log("ComponentWillMount called")
+    async componentWillMount(){
+        console.log("Component Will Mount");
+        const url = "http://localhost:3001/itemRouter";
+        const response = await fetch(url);
+        const data = await response.json(); 
+        console.log("ComponentWillMount")
+        console.log(data);
+        console.log( data[0].dateAdded);
+        this.setState({items:data, isLoading:false});
+        this.setState({isLoading:false});
     }
 
     render(){
         //const classes = userStyles();
         console.log("render called!");
+        console.log(this.state.items);
+        const createItem = 
+                    <Button
+                        outline
+                        fullWidth="true"
+                        startIcon={<AddIcon />}
+                        size="large"
+                        orientation="horizontal"
+                        style={{fontSize:24, border:'solid', borderColor:'orange', padding:'2px'}}
+                        color="secondary">Create Item</Button>;
+
         // items element for every item & map for iterating each element in the array of js objects
-        const items = this.props.items.map((item) =>{
+        const items = this.state.isLoading!==true ?  this.state.items.map((item) =>{
+            console.log(item);
             return(
                 <div className="item">
                     <Card
                         style={{
                             display:'block',
-                            color:'#f09503',    
+                            color:'#2B6705',    
                             transitionDuration:'0.3s',
                         }}
                         outline variant="outlined" key={item.id}
@@ -74,9 +95,9 @@ class Items extends Component{
                             title={`${item.itemName}`}
                             subheader={`Manufacturer: ${item.manufacturingCompany}`}
                         />
-                        {/* <CardContent>
-                            
-                        </CardContent> */}
+                        <CardContent>
+                            <Typography>{`Current Stocks: ${item.currentStock}`}</Typography>
+                        </CardContent>
                         <CardActions>
                             <ButtonGroup
                                 orientation="horizontal"
@@ -102,14 +123,18 @@ class Items extends Component{
                     </Card>
             
                 </div>
-
             );
-        });
+        }): <div>Loading...</div>;
 
         return(
-            <Box paddingTop={7}>
-                <Container maxWidth="xs">
-                    {items}
+            <Box paddingTop={10}>
+                <Container maxWidth="lg">
+                    <div>
+                        {createItem}
+                    </div>
+                    <div>
+                        {items}
+                    </div>
                 </Container>
             </Box>
             
