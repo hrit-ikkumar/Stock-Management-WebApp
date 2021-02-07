@@ -6,14 +6,25 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import AddIcon from '@material-ui/icons/Add';
 import './index.css'; // custom css
 import Info from '@material-ui/icons/Info';
-import {Card, CardActions, CardContent, CardHeader, Container, makeStyles, Typography } from '@material-ui/core';
+import {Card, CardActions, CardContent, CardHeader, Container, makeStyles, Typography, withStyles } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
-import { ITEMS } from '../../shared/items';
+import RemoveIcon from '@material-ui/icons/Remove';
+import Grid from '@material-ui/core/Grid';
 
+const useStyles = (theme) => ({
+    root: {
+      flexGrow: 1
+    },
+    paper: {
+      height: 140,
+      width: 200,
+    },
+    control: {
+      padding: theme.spacing(2),
+    },
+});
 
 class Items extends Component{
-
-    /* Constructor to get values from App.js */
     constructor(props)
     {
         super(props);
@@ -24,10 +35,7 @@ class Items extends Component{
             isLoading: true,
             items: null
         };
-        console.log(this.props.item);
-        console.log("constructor called!");
-        //this.onSelectedItem = this.onSelectedItem.bind(this) // binding in class constructor
-        // above approach is better because binding will be done once
+        this.onSelectedItem = this.onSelectedItem.bind(this) // binding in class constructor
     }
 
     /* onSelectedItem function for keeping track of selected item in given items */
@@ -54,92 +62,118 @@ class Items extends Component{
     async componentWillMount(){
         console.log("Component Will Mount");
         const url = "http://localhost:3001/itemRouter";
-        const response = await fetch(url);
+        const response = await fetch(url); // GET Request
         const data = await response.json(); 
-        console.log("ComponentWillMount")
-        console.log(data);
-        console.log( data[0].dateAdded);
-        this.setState({items:data, isLoading:false});
-        this.setState({isLoading:false});
+        this.setState({items:data, isLoading:false}); // saving data and setting isLoading to false.
     }
 
     render(){
+        const {classes} = this.props;
         //const classes = userStyles();
         console.log("render called!");
         console.log(this.state.items);
         const createItem = 
-                    <Button
-                        outline
-                        fullWidth="true"
-                        startIcon={<AddIcon />}
-                        size="large"
-                        orientation="horizontal"
-                        style={{fontSize:24, border:'solid', borderColor:'orange', padding:'2px'}}
-                        color="secondary">Create Item</Button>;
-
-        // items element for every item & map for iterating each element in the array of js objects
-        const items = this.state.isLoading!==true ?  this.state.items.map((item) =>{
-            console.log(item);
-            return(
-                <div className="item">
-                    <Card
-                        style={{
-                            display:'block',
-                            color:'#2B6705',    
-                            transitionDuration:'0.3s',
-                        }}
-                        outline variant="outlined" key={item.id}
-                        onClick={() => this.onSelectedItem(item.id)}
-                        >
-                        <CardHeader
-                            title={`${item.itemName}`}
-                            subheader={`Manufacturer: ${item.manufacturingCompany}`}
-                        />
-                        <CardContent>
-                            <Typography>{`Current Stocks: ${item.currentStock}`}</Typography>
-                        </CardContent>
-                        <CardActions>
-                            <ButtonGroup
-                                orientation="horizontal"
-                                fullWidth="true"
-                                size="large">
-                                <Button
-                                    startIcon={<SaveIcon />}
-                                    color="primary">
-                                    Edit
-                                </Button>
-                                <Button
-                                    startIcon={<Info />}
-                                    color="success">
-                                    View
-                                </Button>
-                                <Button
-                                    startIcon={<DeleteIcon />}
-                                    color="secondary">
-                                    Delete
-                                </Button>
-                            </ButtonGroup>
-                        </CardActions>
-                    </Card>
+        <Box ml={8} mr={8}>
+            <Button
+                fullWidth="true"
+                startIcon={<AddIcon />}
+                size="medium"
+                style={{fontSize:23}}
+                color="secondary">
+                Create Item
+            </Button>
+        </Box>
             
-                </div>
-            );
-        }): <div>Loading...</div>;
+
+        const items = 
+            this.state.isLoading!==true ?
+                this.state.items.map((item) =>{
+                return(
+                    <Box
+                        ml={8}
+                        mr={8}
+                        mt={4}
+                        mb={2}
+                        size='xs'>
+                        <Card
+                            style={{
+                                display:'block',
+                                color:'#2B6705',    
+                                transitionDuration:'0.3s',
+                            }}
+                            outline
+                            variant="outlined"
+                            key={item.id}
+                            onClick={() => this.onSelectedItem(item.id)}
+                            >
+                            <CardHeader
+                                title={`${item.itemName}`}
+                                subheader={`Manufacturer: ${item.manufacturingCompany}`}
+                            />
+                            <CardContent orientation="horizontal">
+                                <Typography>
+                                    {`Current Stocks: ${item.currentStock}`}
+                                </Typography>
+                                <ButtonGroup>
+                                    <Button 
+                                        startIcon={<AddIcon/>}>
+                                    </Button>
+                                    <Button
+                                        startIcon={<RemoveIcon />}>
+                                    </Button>
+                                </ButtonGroup>
+                            </CardContent>
+                            <CardActions>
+                                <ButtonGroup
+                                    orientation="horizontal"
+                                    fullWidth="true"
+                                    size="xs">
+                                    <Button
+                                        startIcon={<SaveIcon />}
+                                        color="primary">
+                                        Edit
+                                    </Button>
+                                    <Button
+                                        startIcon={<Info />}
+                                        color="success"
+                                        >
+                                        View
+                                    </Button>
+                                    <Button
+                                        startIcon={<DeleteIcon />}
+                                        color="secondary">
+                                        Delete
+                                    </Button>
+                                </ButtonGroup>
+                            </CardActions>
+                        </Card>
+                    </Box>
+                );
+            })
+            :
+            <div>Loading...</div>;
 
         return(
-            <Box paddingTop={10}>
-                <Container maxWidth="lg">
-                    <div>
-                        {createItem}
-                    </div>
-                    <div>
-                        {items}
-                    </div>
-                </Container>
-            </Box>
-            
+            <Grid
+                container
+                className={classes.root}
+                spacing={1}>
+                <Grid 
+                    item 
+                    xs={12}>
+                    <Box
+                        mt={10}>
+                            {createItem}
+                    </Box>
+                    <Grid
+                        container 
+                        justify="center">
+                            {items}
+                    </Grid>
+                </Grid>
+            </Grid>
         );
     }
 }
 
-export default Items;
+export default withStyles(useStyles)(Items);
