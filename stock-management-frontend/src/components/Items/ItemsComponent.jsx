@@ -6,10 +6,11 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import AddIcon from '@material-ui/icons/Add';
 import './index.css'; // custom css
 import Info from '@material-ui/icons/Info';
-import {Card, CardActions, CardContent, CardHeader, Container, makeStyles, Typography, withStyles } from '@material-ui/core';
+import {Card, CardActions, CardContent, CardHeader, Container, IconButton, makeStyles, Typography, withStyles } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import RemoveIcon from '@material-ui/icons/Remove';
 import Grid from '@material-ui/core/Grid';
+import CreateItemComponent from './createItemComponent.jsx/createItemComponent';
 
 const useStyles = (theme) => ({
     root: {
@@ -22,6 +23,12 @@ const useStyles = (theme) => ({
     control: {
       padding: theme.spacing(2),
     },
+    closeButton: {
+        position:'absolute',
+        right: theme.spacing(1),
+        top: theme.spacing(1),
+        color: theme.palette.grey[500]
+    }
 });
 
 class Items extends Component{
@@ -33,7 +40,7 @@ class Items extends Component{
         this.state = {
             selectedItem: null,
             isLoading: true,
-            items: null
+            items: null,
         };
         this.onSelectedItem = this.onSelectedItem.bind(this) // binding in class constructor
     }
@@ -43,8 +50,6 @@ class Items extends Component{
         // setState is async function if you want to run the code in sync way you can pass callback function
         this.setState({selectedItem: item},
             () => console.log(this.state.selectedItem));
-
-        console.log(this.state.selectedItem);
     }
     /*
     arrow function way
@@ -54,13 +59,15 @@ class Items extends Component{
     */
 
     componentDidMount(){
-        console.log("componentDidMount called!");
+        // console.log("componentDidMount called!");
     }
     componentDidUpdate (){
-        console.log("componentDidUpdate called!");
+        // console.log("componentDidUpdate called!");
     }
+    // Deprecated X
+    // Use then
     async componentWillMount(){
-        console.log("Component Will Mount");
+        // console.log("Component Will Mount");
         const url = "http://localhost:3001/itemRouter";
         const response = await fetch(url); // GET Request
         const data = await response.json(); 
@@ -68,26 +75,14 @@ class Items extends Component{
     }
 
     render(){
+        // user defined styles are defined inside the classes
         const {classes} = this.props;
-        //const classes = userStyles();
-        console.log("render called!");
-        console.log(this.state.items);
-        const createItem = 
-        <Box ml={8} mr={8}>
-            <Button
-                fullWidth="true"
-                startIcon={<AddIcon />}
-                size="medium"
-                style={{fontSize:23}}
-                color="secondary">
-                Create Item
-            </Button>
-        </Box>
-            
-
+        
+        // All the items are loaded here by iterating through all
+        // all the items in db
         const items = 
             this.state.isLoading!==true ?
-                this.state.items.map((item) =>{
+                this.state.items.map((item) => {
                 return(
                     <Box
                         ml={8}
@@ -162,14 +157,16 @@ class Items extends Component{
                     item 
                     xs={12}>
                     <Box
-                        mt={10}>
-                            {createItem}
+                        mt={10}
+                        ml={10}>
+                            <CreateItemComponent />
                     </Box>
                     <Grid
                         container 
                         justify="center">
                             {items}
                     </Grid>
+                    {/* Pagination Component in todo */}
                 </Grid>
             </Grid>
         );

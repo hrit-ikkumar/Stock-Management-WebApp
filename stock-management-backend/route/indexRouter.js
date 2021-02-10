@@ -103,35 +103,7 @@ indexRouter.route('/')
     {
         createItemWithDateInItemsCollection(req);        
     }
-}, (err) => next(err))
-// 2. Users should be able to edit an existing item
-.put(
-    body('_id')
-        .not().isEmpty().withMessage('_id field should not be empty')
-        .custom( value => {
-            // checking weather given object id is valid ObjectId or not?
-            if(! mongoose.isValidObjectId(value))
-            {
-                return Promise.reject('_id should be a valid ObjectId');
-            }
-            else
-            {
-                return Promise.resolve('Successfull'); 
-            }
-        }),(req, res, next) => {
-            ITEMS.updateOne({"_id": req.body._id}, {"$set": req.query})
-            .then(item => {
-                res.statusCode = 200; // Successfull creation of item in db
-                res.setHeader('Content-Type', 'application/text');
-                res.send('Successfully updated!');
-            })
-            .catch((err) => {
-                // EDIT Forget
-                res.statusCode = 400;
-                res.setHeader('Content-Type', 'application/text');
-                res.send('Not able to fulfill request.');
-            })
-}, (err) => next(err))
+}, (err) => next(err));
 
 // /withoutDate sub-route for the POST (creation of item in db) wihout date
 // Sub part of 2. Users should be able to edit an existing item
@@ -253,13 +225,13 @@ indexRouter.route('/:id')
     },
     (err) => next(err)
 )
-// 6. Users should be able to increment and decrement the stock of any particular item.
+// 2. Users should be able to edit an existing item
 .put(
     param('id')
-        .not().isEmpty().withMessage('id parameter should not be empty')
-        .custom( id => {
+        .not().isEmpty().withMessage('_id field should not be empty')
+        .custom( value => {
             // checking weather given object id is valid ObjectId or not?
-            if(! mongoose.isValidObjectId(id))
+            if(! mongoose.isValidObjectId(value))
             {
                 return Promise.reject('_id should be a valid ObjectId');
             }
@@ -267,52 +239,32 @@ indexRouter.route('/:id')
             {
                 return Promise.resolve('Successfull'); 
             }
-        })
-        .custom(id => {
-            return ITEMS.findOne({"_id": id}).then(item => {
-                if(!item){
-                    return Promise.reject('Id doesn\'t exit!'); // Reject the creation of item that exits in database
-                }
-                else
-                {
-                    return Promise.resolve('Successfull');
-                }
-            });
-        }),
-    body('changeBy')
-        .custom(changeBy => {
-            if(typeof(changeBy) !== 'number')
+        }),(req, res, next) => {
+            const erros = validationResult(req); // all the errors in validations will be stored here
+            if(!erros.isEmpty())
             {
-                return Promise.reject('changeBy should be number');
+                res.statusCode = 404;
+                res.setHeader('Content-Type', 'application/text');
+                res.send('DELETE IS INVALID' + JSON.stringify(erros));
             }
             else
             {
-                return Promise.resolve('Successfull');
+                ITEMS.updateOne({"_id": req.params.id}, {"$set": req.query})
+                .then(item => {
+                    if(item == null)
+                        res.send('Error');
+                    res.statusCode = 200; // Successfull creation of item in db
+                    res.setHeader('Content-Type', 'application/text');
+                    res.send('Successfully updated!');
+                })
+                .catch((err) => {
+                    // EDIT Forget
+                    res.statusCode = 400;
+                    res.setHeader('Content-Type', 'application/text');
+                    res.send('Not able to fulfill request.');
+                });
             }
-        }),
-    (req,res,next) => {
-        const errors = validationResult(req);
-        if(!errors.isEmpty())
-        {
-            res.statusCode = 400; // Bad Request
-            res.setHeader('Content-Type', 'application/text');
-            res.send('INVALID PUT REQUEST: ' + JSON.stringify(errors));
-        }
-        else
-        {
-            ITEMS.updateOne({"_id": req.params.id}, {"$inc": {"currentStock": req.body.changeBy}})
-            .then((item) => {
-                res.statusCode = 200; // success
-                res.setHeader('Content-Type', 'application/text');
-                res.send('currentStock has been updated'); // response
-            })
-            .catch((err) => {
-                res.statusCode = 400; // Bad Request
-                res.setHeader('Content-Type', 'appication/text');
-                res.send('Bad request!')
-            }); 
-        }
-}, (err) => console.log(err))
+}, (err) => next(err))
 // 4. User should be able to delete any particular item
 .delete(
     param('id')
@@ -419,5 +371,65 @@ indexRouter.route('/:id/currentStock')
         }
     },
     (err) => next(err)
-);
+)
+// 6. Users should be able to increment and decrement the stock of any particular item.
+.put(
+    param('id')
+        .not().isEmpty().withMessage('id parameter should not be empty')
+        .custom( id => {
+            // checking weather given object id is valid ObjectId or not?
+            if(! mongoose.isValidObjectId(id))
+            {
+                return Promise.reject('_id should be a valid ObjectId');
+            }
+            else
+            {
+                return Promise.resolve('Successfull'); 
+            }
+        })
+        .custom(id => {
+            return ITEMS.findOne({"_id": id}).then(item => {
+                if(!item){
+                    return Promise.reject('Id doesn\'t exit!'); // Reject the creation of item that exits in database
+                }
+                else
+                {
+                    return Promise.resolve('Successfull');
+                }
+            });
+        }),
+    body('changeBy')
+        .custom(changeBy => {
+            if(typeof(changeBy) !== 'number')
+            {
+                return Promise.reject('changeBy should be number');
+            }
+            else
+            {
+                return Promise.resolve('Successfull');
+            }
+        }),
+    (req,res,next) => {
+        const errors = validationResult(req);
+        if(!errors.isEmpty())
+        {
+            res.statusCode = 400; // Bad Request
+            res.setHeader('Content-Type', 'application/text');
+            res.send('INVALID PUT REQUEST: ' + JSON.stringify(errors));
+        }
+        else
+        {
+            ITEMS.updateOne({"_id": req.params.id}, {"$inc": {"currentStock": req.body.changeBy}})
+            .then((item) => {
+                res.statusCode = 200; // success
+                res.setHeader('Content-Type', 'application/text');
+                res.send('currentStock has been updated'); // response
+            })
+            .catch((err) => {
+                res.statusCode = 400; // Bad Request
+                res.setHeader('Content-Type', 'appication/text');
+                res.send('Bad request!')
+            }); 
+        }
+}, (err) => console.log(err));
 module.exports = indexRouter;
