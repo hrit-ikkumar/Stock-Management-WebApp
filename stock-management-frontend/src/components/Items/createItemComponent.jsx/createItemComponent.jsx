@@ -59,15 +59,19 @@ const DialogActions = withStyles((theme) => ({
   },
 }))(MuiDialogActions);
 
-export default function CreateItemComponent() {
+export default function CreateItemComponent({postItem}) {
   const [open, setOpen] = React.useState(false);
-  
+  const [itemName, setitemName] = React.useState('Item Name');
+
+
   const classes = useStyles(); 
 
   const handleClickOpen = () => {
     setOpen(true);
   };
   const handleClose = () => {
+    console.log("FUNCTION: " + postItem);
+    console.log("ItemName: " + itemName);
     setOpen(false);
   };
 
@@ -89,6 +93,8 @@ export default function CreateItemComponent() {
                         defaultValue=""
                         variant="outlined"
                         type="string"
+                        value={itemName}
+                        onChange={(event) => setitemName(event.target.itemName)}
                         placeholder="MATCH Stocks"
                         size="small"
                     />

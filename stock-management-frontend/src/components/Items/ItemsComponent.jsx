@@ -6,7 +6,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import AddIcon from '@material-ui/icons/Add';
 import './index.css'; // custom css
 import Info from '@material-ui/icons/Info';
-import {Card, CardActions, CardContent, CardHeader, Container, IconButton, makeStyles, Typography, withStyles } from '@material-ui/core';
+import {Card, CardActions, CardContent, CardHeader, Typography, withStyles } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import RemoveIcon from '@material-ui/icons/Remove';
 import Grid from '@material-ui/core/Grid';
@@ -88,17 +88,15 @@ class Items extends Component{
                         ml={8}
                         mr={8}
                         mt={4}
-                        mb={2}
-                        size='xs'>
+                        mb={2}>
                         <Card
                             style={{
                                 display:'block',
                                 color:'#2B6705',    
                                 transitionDuration:'0.3s',
                             }}
-                            outline
                             variant="outlined"
-                            key={item.id}
+                            key={item.itemName}
                             onClick={() => this.onSelectedItem(item.id)}
                             >
                             <CardHeader
@@ -121,8 +119,7 @@ class Items extends Component{
                             <CardActions>
                                 <ButtonGroup
                                     orientation="horizontal"
-                                    fullWidth="true"
-                                    size="xs">
+                                    fullWidth>
                                     <Button
                                         startIcon={<SaveIcon />}
                                         color="primary">
@@ -130,7 +127,6 @@ class Items extends Component{
                                     </Button>
                                     <Button
                                         startIcon={<Info />}
-                                        color="success"
                                         >
                                         View
                                     </Button>
@@ -159,7 +155,7 @@ class Items extends Component{
                     <Box
                         mt={10}
                         ml={10}>
-                            <CreateItemComponent />
+                            <CreateItemComponent postItem={this.props.postItem} />
                     </Box>
                     <Grid
                         container 

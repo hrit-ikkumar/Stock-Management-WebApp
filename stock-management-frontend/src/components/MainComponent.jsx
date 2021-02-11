@@ -4,7 +4,7 @@ import Footer from './Footer/FooterComponent';
 import Items from './Items/ItemsComponent';
 import {Switch, Route, Redirect, withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
-import {fetchItem, addItem} from '../redux/actions/ActionCreators';
+import {fetchItem, postItem} from '../redux/actions/ActionCreators';
 
 
 const mapStateToProps = state => {
@@ -15,30 +15,22 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = (dispatch) => ({
   fetchItem: () => {dispatch(fetchItem())},
-  addItem: (item) => dispatch(addItem(item))
+  postItem: (itemName, dateAdded, currentStock, manufacturingComapany) => dispatch(postItem(itemName, dateAdded, currentStock, manufacturingComapany))
 })
-
 
 // Class Component
 class Main extends Component{
-  constructor(props)
-  {
-    super(props);
-    this.state = {
-    };
-  }
 
   componentDidMount() {
     this.props.fetchItem(); // fetch all the items;
   }
-
 
   render() {
     return(
       <div>
         <Header />    
           <Switch>
-            <Route path="/home" component={() => <Items Items = {this.props.Items} />} />
+            <Route path="/home" component={() => <Items Items = {this.props.Items} postItem = {this.props.postItem} />} />
             <Redirect to="/home" />
           </Switch>
         <Footer />
