@@ -32,37 +32,17 @@ const useStyles = (theme) => ({
 });
 
 class Items extends Component{
-    constructor(props)
-    {
-        super(props);
-        
-        // It's own state
-        this.state = {
-            selectedItem: null,
-            isLoading: true,
-            items: null,
-        };
-        this.onSelectedItem = this.onSelectedItem.bind(this) // binding in class constructor
-    }
-
-    /* onSelectedItem function for keeping track of selected item in given items */
-    onSelectedItem(item){
-        // setState is async function if you want to run the code in sync way you can pass callback function
-        this.setState({selectedItem: item},
-            () => console.log(this.state.selectedItem));
-    }
 
     render(){
         // user defined styles are defined inside the classes
         const {classes} = this.props;
-        console.log("ITEMS: " + this.props.items);
-        // All the items are loaded here by iterating through all
-        // all the items in db
+        
         const items = 
             this.props.items.isLoading!==true ?
                 this.props.items.items.map((item) => {
                 return(
                     <Box
+                        key={item.id}
                         ml={8}
                         mr={8}
                         mt={4}
@@ -74,8 +54,8 @@ class Items extends Component{
                                 transitionDuration:'0.3s',
                             }}
                             variant="outlined"
-                            key={item.id}
-                            onClick={() => this.onSelectedItem(item.id)}
+                            // key={item.id}
+                            // onClick={() => this.onSelectedItem(item.id)}
                             >
                             <CardHeader
                                 title={`${item.itemName}`}

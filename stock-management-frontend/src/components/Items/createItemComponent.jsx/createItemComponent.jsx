@@ -12,12 +12,12 @@ import {makeStyles} from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 
 const useStyles = makeStyles((theme) => ({
-root: {
-    '& .MuiTextField-root': {
-    margin: theme.spacing(1),
-    width: 200,
-    },
-},
+  root: {
+      '& .MuiTextField-root': {
+      margin: theme.spacing(1),
+      width: 200,
+      },
+  },
 }));
 const styles = (theme) => ({
   root: {
@@ -60,17 +60,25 @@ const DialogActions = withStyles((theme) => ({
 }))(MuiDialogActions);
 
 export default function CreateItemComponent({postItem}) {
+  // React HOOKS
   const [open, setOpen] = React.useState(false);
   const [itemName, setitemName] = React.useState('Item Name');
-
+  const [dateAdded, setdateAdded] = React.useState('');
+  const [currentStok, setCurrentStock] = React.useState(0);
+  const [manufacturingCompany, setManufacturingCompany] = React.useState('');
 
   const classes = useStyles(); 
 
   const handleClickOpen = () => {
     setOpen(true);
   };
+
   const handleClose = () => {
-    console.log("FUNCTION: " + postItem);
+    const newItemName = itemName;
+    const newDateAdded = new Date(dateAdded);
+    const newCurrentStock = currentStok;
+    const newManfuacturingCompany = manufacturingCompany;
+    postItem(newItemName, newDateAdded, newCurrentStock, newManfuacturingCompany);
     setOpen(false);
   };
 
@@ -92,17 +100,18 @@ export default function CreateItemComponent({postItem}) {
                         defaultValue=""
                         variant="outlined"
                         type="string"
-                        value={itemName}
-                        onChange={(event) => setitemName(event.target.itemName)}
+                        // value={itemName}
+                        onChange={(event) => {setitemName(event.target.value)}}
                         placeholder="MATCH Stocks"
                         size="small"
                     />
                     <TextField
                         label="Current Stock"
                         id="outlined-size-small"
-                        defaultValue="0"
                         type="number"
                         variant="outlined"
+                        value={currentStok}
+                        onChange={(event) => {setCurrentStock(event.target.value)}}
                         placeholder="1003"
                         size="small"
                     />
@@ -111,17 +120,19 @@ export default function CreateItemComponent({postItem}) {
                     <TextField
                         label="Manufacturer"
                         id="outlined-full-width"
-                        defaultValue=""
                         variant="outlined"
                         type="string"
+                        value={manufacturingCompany}
+                        onChange={(event) => setManufacturingCompany(event.target.value)}
                         placeholder="MyAnatomy"
                         size="small"
                     />
                     <TextField
                         label=""
                         id="outlined-helperText"
-                        defaultValue="18/02/2021"
                         variant="outlined"
+                        value={dateAdded}
+                        onChange={(event) => {setdateAdded(event.target.value)}}
                         type="date"
                         size="small"
                     />

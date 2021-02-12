@@ -15,7 +15,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = (dispatch) => ({
   fetchItem: () => {dispatch(fetchItem())},
-  postItem: (itemName, dateAdded, currentStock, manufacturingComapany) => dispatch(postItem(itemName, dateAdded, currentStock, manufacturingComapany))
+  postItem: (itemName, dateAdded, currentStock, manufacturingCompany) => dispatch(postItem(itemName, dateAdded, currentStock, manufacturingCompany))
 })
 
 // Class Component
@@ -26,7 +26,6 @@ class Main extends Component{
   }
 
   render() {
-    console.log(this.props.Items);
     return(
       <div>
         <Header />    

@@ -2,7 +2,7 @@ import * as ActionTypes from './ActionTypes';
 
 const baseUrl = "http://localhost:3001/";
 
-export const addItem = (item) => ({
+export const addItem = (item) => ({ 
     type: ActionTypes.CREATE_ITEM,
     payload: item
 });
@@ -41,13 +41,14 @@ export const fetchItem = () => (dispatch) => {
         .catch(error => dispatch(itemFailed(error.message)));
 }
 
-export const postItem = (itemName, dateAdded, currentStock, manufacturingComapany) => (dispatch) => {
+export const postItem = (itemName, dateAdded, currentStock, manufacturingCompany) => (dispatch) => {
     const newItem = {
         itemName: itemName,
         dateAdded: dateAdded,
         currentStock: currentStock,
-        manufacturingComapany: manufacturingComapany
+        manufacturingCompany: manufacturingCompany,
     };
+    console.log("New Item: " + JSON.stringify(newItem));
     return fetch(baseUrl +'itemRouter', {
         method: 'POST',
         body: JSON.stringify(newItem),
@@ -71,13 +72,13 @@ export const postItem = (itemName, dateAdded, currentStock, manufacturingComapan
         var errmess = new Error(error.message);
         throw errmess;
     })
-    .then(response => response.json())
-    .then(response => dispatch(addItem(response)))
-    .catch(
-        error => 
-        { 
-            console.log('Post comments ', error.message);
-            alert('Your item could not be created\nError: '+ error.message); 
-        });
+.then(response => {
+    // alert('Your comment could not be posted\nError: '+ newItem);
+    return dispatch(fetchItem());
+    })
+    .catch(error => { 
+                console.log('Post comments ', error.message);
+                alert('Your comment could not be posted\nError: '+ error.message);
+            });
 }
 
