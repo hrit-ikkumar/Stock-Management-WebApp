@@ -9,7 +9,7 @@ import {fetchItem, postItem} from '../redux/actions/ActionCreators';
 
 const mapStateToProps = state => {
   return {
-    Items: state.Items,
+    items: state.items,
   }
 }
 
@@ -26,11 +26,12 @@ class Main extends Component{
   }
 
   render() {
+    console.log(this.props.Items);
     return(
       <div>
         <Header />    
           <Switch>
-            <Route path="/home" component={() => <Items Items = {this.props.Items} postItem = {this.props.postItem} />} />
+            <Route path="/home" component={() => <Items items = {this.props.items} postItem = {this.props.postItem} />} />
             <Redirect to="/home" />
           </Switch>
         <Footer />

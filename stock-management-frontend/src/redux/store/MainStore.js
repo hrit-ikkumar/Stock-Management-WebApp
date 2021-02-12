@@ -10,6 +10,5 @@ export const MainStore = () => {
         }),
         applyMiddleware(thunk, logger)
     );
-
     return store;
 }

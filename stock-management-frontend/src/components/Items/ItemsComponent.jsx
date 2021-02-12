@@ -51,38 +51,16 @@ class Items extends Component{
         this.setState({selectedItem: item},
             () => console.log(this.state.selectedItem));
     }
-    /*
-    arrow function way
-    onSelected = (item) => {
-
-    }
-    */
-
-    componentDidMount(){
-        // console.log("componentDidMount called!");
-    }
-    componentDidUpdate (){
-        // console.log("componentDidUpdate called!");
-    }
-    // Deprecated X
-    // Use then
-    async componentWillMount(){
-        // console.log("Component Will Mount");
-        const url = "http://localhost:3001/itemRouter";
-        const response = await fetch(url); // GET Request
-        const data = await response.json(); 
-        this.setState({items:data, isLoading:false}); // saving data and setting isLoading to false.
-    }
 
     render(){
         // user defined styles are defined inside the classes
         const {classes} = this.props;
-        
+        console.log("ITEMS: " + this.props.items);
         // All the items are loaded here by iterating through all
         // all the items in db
         const items = 
-            this.state.isLoading!==true ?
-                this.state.items.map((item) => {
+            this.props.items.isLoading!==true ?
+                this.props.items.items.map((item) => {
                 return(
                     <Box
                         ml={8}
@@ -96,7 +74,7 @@ class Items extends Component{
                                 transitionDuration:'0.3s',
                             }}
                             variant="outlined"
-                            key={item.itemName}
+                            key={item.id}
                             onClick={() => this.onSelectedItem(item.id)}
                             >
                             <CardHeader

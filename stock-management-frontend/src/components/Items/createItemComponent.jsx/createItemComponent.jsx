@@ -71,7 +71,6 @@ export default function CreateItemComponent({postItem}) {
   };
   const handleClose = () => {
     console.log("FUNCTION: " + postItem);
-    console.log("ItemName: " + itemName);
     setOpen(false);
   };
 
