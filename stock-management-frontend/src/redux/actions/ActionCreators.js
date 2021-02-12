@@ -17,6 +17,11 @@ export const itemFailed = () => ({
     type: ActionTypes.FAILED_ITEM
 });
 
+export const appendItem = (item) => ({
+    type: ActionTypes.ADD_ITEM,
+    payload: item
+});
+
 export const fetchItem = () => (dispatch) => {
     dispatch(itemLoading(true));
 
@@ -38,7 +43,7 @@ export const fetchItem = () => (dispatch) => {
             throw errMessage;
         })
         .then(response => response.json())
-        .then(items => dispatch(addItem(items)))
+        .then(items => dispatch(appendItem(items)))
         .catch(error => dispatch(itemFailed(error.message)));
 }
 
@@ -75,7 +80,7 @@ export const postItem = (itemName, dateAdded, currentStock, manufacturingCompany
     })
 .then(response => {
     // alert('Your comment could not be posted\nError: '+ newItem);
-    return dispatch(fetchItem());
+    return dispatch(appendItem([newItem]));
     })
     .catch(error => { 
             console.log('Post item: ', error.message);

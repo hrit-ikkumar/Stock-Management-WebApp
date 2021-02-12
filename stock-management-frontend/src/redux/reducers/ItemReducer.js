@@ -9,6 +9,8 @@ export const Items = (state = {
     switch(action.type) {
         case ActionTypes.CREATE_ITEM:
             return {...state, isLoading: false, errorMessage: null, items: action.payload};
+        case ActionTypes.ADD_ITEM:
+            return {...state, isLoading: false, errorMessage: null, items: state.items.concat(action.payload)};
         case ActionTypes.LOADING_ITEM:
             return {...state, isLoading: true, errorMessage: null, items: []};
         case ActionTypes.FAILED_ITEM:
