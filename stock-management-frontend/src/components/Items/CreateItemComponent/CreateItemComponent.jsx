@@ -62,7 +62,7 @@ const DialogActions = withStyles((theme) => ({
 export default function CreateItemComponent({postItem}) {
   // React HOOKS
   const [open, setOpen] = React.useState(false);
-  const [itemName, setitemName] = React.useState('Item Name');
+  const [itemName, setitemName] = React.useState('');
   const [dateAdded, setdateAdded] = React.useState('');
   const [currentStok, setCurrentStock] = React.useState(0);
   const [manufacturingCompany, setManufacturingCompany] = React.useState('');
@@ -82,13 +82,17 @@ export default function CreateItemComponent({postItem}) {
     setOpen(false);
   };
 
+  const handleCloseDialog = () => {
+    setOpen(false);
+  }
+
   return (
     <div>
       <Button variant="contained" color="secondary" onClick={handleClickOpen}>
         + New
       </Button>
       <Dialog onClose={handleClose} aria-labelledby="customized-dialog-title" open={open}>
-        <DialogTitle id="customized-dialog-title" onClose={handleClose}>
+        <DialogTitle id="customized-dialog-title" onClose={handleCloseDialog}>
           New Item
         </DialogTitle>
         <DialogContent dividers>
@@ -100,7 +104,7 @@ export default function CreateItemComponent({postItem}) {
                         defaultValue=""
                         variant="outlined"
                         type="string"
-                        // value={itemName}
+                        value={itemName}
                         onChange={(event) => {setitemName(event.target.value)}}
                         placeholder="MATCH Stocks"
                         size="small"

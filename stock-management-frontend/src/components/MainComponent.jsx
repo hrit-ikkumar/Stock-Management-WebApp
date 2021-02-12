@@ -4,7 +4,7 @@ import Footer from './Footer/FooterComponent';
 import Items from './Items/ItemsComponent';
 import {Switch, Route, Redirect, withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
-import {fetchItem, postItem} from '../redux/actions/ActionCreators';
+import {fetchItem, postItem, incrementCurrentStock, decrementCurrentStock, deleteItem} from '../redux/actions/ActionCreators';
 
 
 const mapStateToProps = state => {
@@ -15,7 +15,10 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = (dispatch) => ({
   fetchItem: () => {dispatch(fetchItem())},
-  postItem: (itemName, dateAdded, currentStock, manufacturingCompany) => dispatch(postItem(itemName, dateAdded, currentStock, manufacturingCompany))
+  postItem: (itemName, dateAdded, currentStock, manufacturingCompany) => dispatch(postItem(itemName, dateAdded, currentStock, manufacturingCompany)),
+  incrementCurrentStock: (id) => dispatch(incrementCurrentStock(id)),
+  decrementCurrentStock: (id) => dispatch(decrementCurrentStock(id)),
+  deleteItem: (id) => dispatch(deleteItem(id))
 })
 
 // Class Component
@@ -30,7 +33,14 @@ class Main extends Component{
       <div>
         <Header />    
           <Switch>
-            <Route path="/home" component={() => <Items items = {this.props.items} postItem = {this.props.postItem} />} />
+            <Route path="/home"
+              component={() => <Items items = {this.props.items} 
+                postItem = {this.props.postItem}
+                incrementCurrentStock={this.props.incrementCurrentStock}
+                decrementCurrentStock={this.props.decrementCurrentStock} 
+                deleteItem={this.props.deleteItem}
+              />} 
+            />
             <Redirect to="/home" />
           </Switch>
         <Footer />

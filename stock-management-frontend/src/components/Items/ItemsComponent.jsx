@@ -5,12 +5,13 @@ import SaveIcon from '@material-ui/icons/Save';
 import DeleteIcon from '@material-ui/icons/Delete';
 import AddIcon from '@material-ui/icons/Add';
 import './index.css'; // custom css
-import Info from '@material-ui/icons/Info';
+// import Info from '@material-ui/icons/Info';
 import {Card, CardActions, CardContent, CardHeader, Typography, withStyles } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import RemoveIcon from '@material-ui/icons/Remove';
 import Grid from '@material-ui/core/Grid';
-import CreateItemComponent from './createItemComponent.jsx/createItemComponent';
+import CreateItemComponent from './CreateItemComponent/CreateItemComponent';
+import ViewItemComponent from './ViewItemComponent/ViewItemComponent';
 
 const useStyles = (theme) => ({
     root: {
@@ -32,7 +33,6 @@ const useStyles = (theme) => ({
 });
 
 class Items extends Component{
-
     render(){
         // user defined styles are defined inside the classes
         const {classes} = this.props;
@@ -42,7 +42,7 @@ class Items extends Component{
                 this.props.items.items.map((item) => {
                 return(
                     <Box
-                        key={item.id}
+                        key={item._id}
                         ml={8}
                         mr={8}
                         mt={4}
@@ -67,15 +67,24 @@ class Items extends Component{
                                 </Typography>
                                 <ButtonGroup>
                                     <Button 
-                                        startIcon={<AddIcon/>}>
+                                        startIcon={<AddIcon/>}
+                                        onClick={ event => {
+                                            this.props.incrementCurrentStock(item._id);
+                                        }}
+                                    >
                                     </Button>
                                     <Button
-                                        startIcon={<RemoveIcon />}>
+                                        startIcon={<RemoveIcon />}
+                                        onClick={ event => {
+                                            this.props.decrementCurrentStock(item._id);
+                                        }}>
                                     </Button>
                                 </ButtonGroup>
                             </CardContent>
                             <CardActions>
                                 <ButtonGroup
+                                    variant="contained"
+                                    spacing={2}
                                     orientation="horizontal"
                                     fullWidth>
                                     <Button
@@ -83,14 +92,16 @@ class Items extends Component{
                                         color="primary">
                                         Edit
                                     </Button>
-                                    <Button
-                                        startIcon={<Info />}
-                                        >
-                                        View
-                                    </Button>
+                                    <ViewItemComponent item={item} />
                                     <Button
                                         startIcon={<DeleteIcon />}
-                                        color="secondary">
+                                        color="secondary"
+                                        onClick={
+                                            event => {
+                                                this.props.deleteItem(item._id);
+                                            }
+                                        }
+                                        >
                                         Delete
                                     </Button>
                                 </ButtonGroup>
