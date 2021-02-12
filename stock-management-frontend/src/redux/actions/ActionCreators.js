@@ -77,8 +77,8 @@ export const postItem = (itemName, dateAdded, currentStock, manufacturingCompany
     return dispatch(fetchItem());
     })
     .catch(error => { 
-                console.log('Post comments ', error.message);
-                alert('Your comment could not be posted\nError: '+ error.message);
-            });
+            console.log('Post item: ', error.message);
+            alert('Your item could not be posted\nError: '+ error.message);
+        });
 }
 
