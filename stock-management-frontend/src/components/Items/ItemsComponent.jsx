@@ -59,11 +59,11 @@ class Items extends Component{
                             >
                             <CardHeader
                                 title={`${item.itemName}`}
-                                subheader={`Manufacturer: ${item.manufacturingCompany}`}
+                                subheader={`Company: ${item.manufacturingCompany}`}
                             />
                             <CardContent orientation="horizontal">
                                 <Typography>
-                                    {`Current Stocks: ${item.currentStock}`}
+                                    {`Stocks: ${item.currentStock}`}
                                 </Typography>
                                 <ButtonGroup>
                                     <Button 

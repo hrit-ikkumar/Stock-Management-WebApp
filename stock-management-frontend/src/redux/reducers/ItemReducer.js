@@ -1,14 +1,19 @@
 import * as ActionTypes from '../actions/ActionTypes';
 
-export const Items = (state = {
+const defaultState = {
     isLoading: true,
     errorMessage: null,
     selectedItem: null,
     items: []
-}, action) => {
+};
+
+export const Items = (state=defaultState , action) => {
     switch(action.type) {
         case ActionTypes.CREATE_ITEM:
-            return {...state, isLoading: false, errorMessage: null, items: action.payload};
+        {
+            const newItems =state.items.concat(action.payload);
+            return {...state, isLoading: false, errorMessage: null, items: newItems};
+        }   
         case ActionTypes.ADD_ITEM:
             return {...state, isLoading: false, errorMessage: null, items: state.items.concat(action.payload)};
         case ActionTypes.LOADING_ITEM:
