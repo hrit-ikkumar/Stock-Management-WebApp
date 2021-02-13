@@ -79,7 +79,7 @@ application with the following requirements:
 2. Date added on
 3. Current stock
 4. Manufacturing company
-1. 
+
 ------------------------------------------------------------------------------------------------------------
 
 
