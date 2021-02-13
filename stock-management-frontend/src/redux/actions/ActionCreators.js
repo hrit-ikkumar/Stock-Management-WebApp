@@ -22,6 +22,22 @@ export const appendItem = (item) => ({
     payload: item
 });
 
+export const removeItem = (id) => ({
+    type: ActionTypes.DELETE_ITEM,
+    payload: id
+});
+
+export const incrementItemStock = (id) => ({
+    type: ActionTypes.INC_ITEM_STOCK,
+    payload: id
+});
+
+export const decrementItemStock = (id) => ({
+    type: ActionTypes.DEC_ITEM_STOCK,
+    payload: id
+});
+
+
 export const fetchItem = () => (dispatch) => {
     dispatch(itemLoading(true));
 
@@ -54,7 +70,6 @@ export const postItem = (itemName, dateAdded, currentStock, manufacturingCompany
         currentStock: currentStock,
         manufacturingCompany: manufacturingCompany,
     };
-    console.log("New Item: " + JSON.stringify(newItem));
     return fetch(baseUrl +'itemRouter', {
         method: 'POST',
         body: JSON.stringify(newItem),
@@ -78,7 +93,9 @@ export const postItem = (itemName, dateAdded, currentStock, manufacturingCompany
         var errmess = new Error(error.message);
         throw errmess;
     })
+.then(response => response.json())
 .then(response => {
+    newItem._id = response._id;
     // alert('Your comment could not be posted\nError: '+ newItem);
     return dispatch(appendItem([newItem]));
     })
@@ -92,7 +109,6 @@ export const incrementCurrentStock = (id) => (dispatch) => {
     const change = {
         changeBy: 1
     };
-    console.log("ID: " + id);
     return fetch(baseUrl + 'itemRouter/' + id + '/currentStock', {
         method: 'PUT',
         body: JSON.stringify(change),
@@ -117,7 +133,7 @@ export const incrementCurrentStock = (id) => (dispatch) => {
         throw errorMessage;
     })
     .then(response => {
-        return dispatch(fetchItem());
+        return dispatch(incrementItemStock(id));
     })
     .catch(error => { 
         console.log('PUT item (INCR): ', error.message);
@@ -154,7 +170,7 @@ export const decrementCurrentStock = (id) => (dispatch) => {
         throw errorMessage;
     })
     .then(response => {
-        return dispatch(fetchItem());
+        return dispatch(decrementItemStock(id));
     })
     .catch(error => { 
         console.log('PUT item (DECR): ', error.message);
@@ -186,11 +202,11 @@ export const deleteItem = (id) => (dispatch) => {
         throw errorMessage;
     })
     .then(response => {
-        return dispatch(fetchItem());
+        return dispatch(removeItem(id));
     })
     .catch((error) => {
         console.log('DELETE item: ', error.message);
         alert('Your item is not deleted: ' + error.message);
-    })
+    }) 
 }
 

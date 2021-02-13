@@ -70,8 +70,9 @@ indexRouter.route('/')
 
     // Always prefer to write arrow functions instead to actual function
      createItemWithDateInItemsCollection = async (request) => {
+        const newItemId = new mongoose.Types.ObjectId();
         await ITEMS.create({
-            _id: new mongoose.Types.ObjectId(),
+            _id: newItemId,
             itemName: request.body.itemName,
             dateAdded: request.body.dateAdded,
             currentStock: request.body.currentStock,
@@ -79,8 +80,8 @@ indexRouter.route('/')
         })
         .then((items) => {
             res.statusCode = 200;
-            res.setHeader('Content-Type', 'application/text');
-            res.send("Item has been created!");    
+            res.setHeader('Content-Type', 'application/json');
+            res.send({"_id":newItemId});    
         }, (err) => next(err))
         .catch((err) => {
             res.statusCode = 400;

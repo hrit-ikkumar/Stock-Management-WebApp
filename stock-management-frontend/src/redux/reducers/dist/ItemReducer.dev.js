@@ -33,20 +33,72 @@ var Items = function Items() {
   switch (action.type) {
     case ActionTypes.CREATE_ITEM:
       {
-        var newItems = state.items.concat(action.payload);
         return _objectSpread({}, state, {
           isLoading: false,
           errorMessage: null,
-          items: newItems
+          items: action.payload
         });
       }
 
     case ActionTypes.ADD_ITEM:
-      return _objectSpread({}, state, {
-        isLoading: false,
-        errorMessage: null,
-        items: state.items.concat(action.payload)
-      });
+      {
+        return _objectSpread({}, state, {
+          isLoading: false,
+          errorMessage: null,
+          items: state.items.concat(action.payload)
+        });
+      }
+
+    case ActionTypes.DELETE_ITEM:
+      {
+        var index = state.items.findIndex(function (x) {
+          return x._id === action.payload;
+        });
+
+        if (index !== undefined) {
+          state.items.splice(index, 1);
+        }
+
+        return _objectSpread({}, state, {
+          isLoading: false,
+          errorMessage: null,
+          items: state.items
+        });
+      }
+
+    case ActionTypes.INC_ITEM_STOCK:
+      {
+        var _index = state.items.findIndex(function (x) {
+          return x._id === action.payload;
+        });
+
+        if (_index !== undefined) {
+          state.items[_index].currentStock += 1;
+        }
+
+        return _objectSpread({}, state, {
+          isLoading: false,
+          errorMesssage: null,
+          items: state.items
+        });
+      }
+
+    case ActionTypes.DEC_ITEM_STOCK:
+      {
+        var _index2 = state.items.findIndex(function (x) {
+          return x._id === action.payload;
+        });
+
+        if (_index2 !== undefined) {
+          state.items[_index2].currentStock -= 1;
+        }
+
+        return _objectSpread({}, state, {
+          isLoading: false,
+          errorMesssage: null,
+          items: state.items
+        });
+      }
 
     case ActionTypes.LOADING_ITEM:
       return _objectSpread({}, state, {

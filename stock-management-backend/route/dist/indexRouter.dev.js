@@ -76,21 +76,25 @@ body('itemName').isString().withMessage('itemName should be string') // conditio
 }), function (req, res, next) {
   // Always prefer to write arrow functions instead to actual function
   createItemWithDateInItemsCollection = function createItemWithDateInItemsCollection(request) {
+    var newItemId;
     return regeneratorRuntime.async(function createItemWithDateInItemsCollection$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            _context.next = 2;
+            newItemId = new mongoose.Types.ObjectId();
+            _context.next = 3;
             return regeneratorRuntime.awrap(ITEMS.create({
-              _id: new mongoose.Types.ObjectId(),
+              _id: newItemId,
               itemName: request.body.itemName,
               dateAdded: request.body.dateAdded,
               currentStock: request.body.currentStock,
               manufacturingCompany: request.body.manufacturingCompany
             }).then(function (items) {
               res.statusCode = 200;
-              res.setHeader('Content-Type', 'application/text');
-              res.send("Item has been created!");
+              res.setHeader('Content-Type', 'application/json');
+              res.send({
+                "_id": newItemId
+              });
             }, function (err) {
               return next(err);
             })["catch"](function (err) {
@@ -99,7 +103,7 @@ body('itemName').isString().withMessage('itemName should be string') // conditio
               res.send('ERROR INVALID');
             }));
 
-          case 2:
+          case 3:
           case "end":
             return _context.stop();
         }
