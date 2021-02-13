@@ -28,21 +28,33 @@ application with the following requirements:
 ------------------------------------------------------------------------------------------------------------
 **Developer requirements** ​:
 ❏ Perform all the required CRUD operations
+
 ❏ Create at least one GET request
+
 ❏ Create at least one POST request
+
 ❏ Create at least on PUT request
+
 ❏ Create at least one DELETE request
+
 ❏ Use mongoose as the ODM.
+
 ❏ At least one request should have query parameters
+
 ❏ At least one request should have path parameters
+
 ❏ At least one mongoose schema should have a custom index.
+
 ❏ At least one component should have Jest snapshot tests.
+
 ❏ At least one API should have mocha unit tests.
+
 ❏ At least one component should have redux-store accessed props.
+
 ❏ At least one component should have hierarchically passed props.
 
-
 ❏ At least one component should have prop validations.
+
 ------------------------------------------------------------------------------------------------------------
 **Instructions:**
 
