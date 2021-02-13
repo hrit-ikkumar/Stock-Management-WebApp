@@ -15,7 +15,6 @@ application with the following requirements:
 6. Users should be able to increment and decrement the stock of any particular item.
 7. Users should be able to view all the details of any particular item.
 ------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------
 **Learn about the following technologies** ​:
 1. REST api
 2. JSON/XML
@@ -26,7 +25,6 @@ application with the following requirements:
 7. MongoDB
 8. Jest for unit tests
 9. Mocha for unit tests
-------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------
 **Developer requirements** ​:
 ❏ Perform all the required CRUD operations
@@ -46,14 +44,12 @@ application with the following requirements:
 
 ❏ At least one component should have prop validations.
 ------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------
 **Instructions:**
 
 - The UI of the application should be appealing and easy to use
 - The application should justify the area of the problem statement
 - Clean and sustainable code will be appreciated. Code should be readable/easily
 - understandable
-------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------
 **Inventory structure** ​:
 1. Item name
