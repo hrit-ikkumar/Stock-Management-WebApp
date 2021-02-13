@@ -85,6 +85,7 @@ var Items = function Items() {
 
     case ActionTypes.INC_ITEM_STOCK:
       {
+        // create a copy of items then update 
         var _index2 = state.items.findIndex(function (x) {
           return x._id === action.payload;
         });

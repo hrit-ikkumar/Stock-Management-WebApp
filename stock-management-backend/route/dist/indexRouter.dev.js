@@ -259,8 +259,8 @@ indexRouter.route('/:id').get(param('id').custom(function (value) {
       if (item == null) res.send('Error');
       res.statusCode = 200; // Successfull creation of item in db
 
-      res.setHeader('Content-Type', 'application/text');
-      res.send('Successfully updated!');
+      res.setHeader('Content-Type', 'application/json');
+      res.json('Successfully updated!');
     })["catch"](function (err) {
       // EDIT Forget
       res.statusCode = 400;
@@ -407,6 +407,7 @@ indexRouter.route('/:id/currentStock').get(param('id').custom(function (id) {
     res.setHeader('Content-Type', 'application/text');
     res.send('INVALID PUT REQUEST: ' + JSON.stringify(errors));
   } else {
+    // findOneAndUpdate use new
     ITEMS.updateOne({
       "_id": req.params.id
     }, {
@@ -416,8 +417,8 @@ indexRouter.route('/:id/currentStock').get(param('id').custom(function (id) {
     }).then(function (item) {
       res.statusCode = 200; // success
 
-      res.setHeader('Content-Type', 'application/text');
-      res.send('currentStock has been updated'); // response
+      res.setHeader('Content-Type', 'application/json');
+      res.json(item); // response
     })["catch"](function (err) {
       res.statusCode = 400; // Bad Request
 

@@ -158,7 +158,7 @@ exports.postItem = postItem;
 var incrementCurrentStock = function incrementCurrentStock(id) {
   return function (dispatch) {
     var change = {
-      changeBy: 1
+      changeBy: 4
     };
     return fetch(baseUrl + 'itemRouter/' + id + '/currentStock', {
       method: 'PUT',

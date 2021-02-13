@@ -38,6 +38,7 @@ export const Items = (state=defaultState , action) => {
         }
         case ActionTypes.INC_ITEM_STOCK: 
         {
+            // create a copy of items then update 
             const index = state.items.findIndex(x => x._id === action.payload);
             if(index !== undefined)
             {

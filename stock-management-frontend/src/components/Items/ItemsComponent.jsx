@@ -4,7 +4,6 @@ import ButtonGroup from '@material-ui/core/ButtonGroup';
 import DeleteIcon from '@material-ui/icons/Delete';
 import AddIcon from '@material-ui/icons/Add';
 import './index.css'; // custom css
-// import Info from '@material-ui/icons/Info';
 import {Card, CardActions, CardContent, CardHeader, Typography, withStyles } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import RemoveIcon from '@material-ui/icons/Remove';
@@ -55,8 +54,6 @@ class Items extends Component{
                                 transitionDuration:'0.3s',
                             }}
                             variant="outlined"
-                            // key={item.id}
-                            // onClick={() => this.onSelectedItem(item.id)}
                             >
                             <CardHeader
                                 title={`${item.itemName}`}

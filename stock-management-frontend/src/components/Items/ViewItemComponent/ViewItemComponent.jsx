@@ -8,18 +8,8 @@ import MuiDialogActions from '@material-ui/core/DialogActions';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
-// import {makeStyles} from '@material-ui/core/styles';
-// import TextField from '@material-ui/core/TextField';
 import Info from '@material-ui/icons/Info';
 
-// const useStyles = makeStyles((theme) => ({
-//   root: {
-//       '& .MuiTextField-root': {
-//       margin: theme.spacing(1),
-//       width: 200,
-//       },
-//   },
-// }));
 const styles = (theme) => ({
   root: {
     margin: 0,

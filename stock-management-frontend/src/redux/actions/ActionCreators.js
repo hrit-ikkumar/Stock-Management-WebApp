@@ -112,7 +112,7 @@ export const postItem = (itemName, dateAdded, currentStock, manufacturingCompany
 
 export const incrementCurrentStock = (id) => (dispatch) => {
     const change = {
-        changeBy: 1
+        changeBy: 4
     };
     return fetch(baseUrl + 'itemRouter/' + id + '/currentStock', {
         method: 'PUT',
