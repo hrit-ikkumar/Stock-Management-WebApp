@@ -27,6 +27,15 @@ export const Items = (state=defaultState , action) => {
             return {...state, isLoading: false, errorMessage: null, items:state.items};
 
         }
+        case ActionTypes.EDIT_ITEM:
+        {
+            const index = state.items.findIndex(x => x._id === action.payload._id);
+            if(index !== undefined)
+            {
+                state.items[index] = action.payload;
+            }
+            return {...state, isLoading: false, errorMessage: null, items: state.items};
+        }
         case ActionTypes.INC_ITEM_STOCK: 
         {
             const index = state.items.findIndex(x => x._id === action.payload);

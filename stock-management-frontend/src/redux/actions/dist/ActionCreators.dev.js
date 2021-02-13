@@ -5,7 +5,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.deleteItem = exports.decrementCurrentStock = exports.incrementCurrentStock = exports.postItem = exports.fetchItem = exports.decrementItemStock = exports.incrementItemStock = exports.removeItem = exports.appendItem = exports.itemFailed = exports.itemLoading = exports.addItem = void 0;
+exports.editItem = exports.deleteItem = exports.decrementCurrentStock = exports.incrementCurrentStock = exports.postItem = exports.fetchItem = exports.editItemValue = exports.decrementItemStock = exports.incrementItemStock = exports.removeItem = exports.appendItem = exports.itemFailed = exports.itemLoading = exports.addItem = void 0;
 
 var _icons = require("@material-ui/icons");
 
@@ -78,6 +78,15 @@ var decrementItemStock = function decrementItemStock(id) {
 };
 
 exports.decrementItemStock = decrementItemStock;
+
+var editItemValue = function editItemValue(item) {
+  return {
+    type: ActionTypes.EDIT_ITEM,
+    payload: item
+  };
+};
+
+exports.editItemValue = editItemValue;
 
 var fetchItem = function fetchItem() {
   return function (dispatch) {
@@ -245,3 +254,30 @@ var deleteItem = function deleteItem(id) {
 };
 
 exports.deleteItem = deleteItem;
+
+var editItem = function editItem(item) {
+  return function (dispatch) {
+    return fetch(baseUrl + 'itemRouter/' + item._id, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'same-origin'
+    }).then(function (response) {
+      if (response.ok) {
+        return response;
+      } else {
+        var errorMessage = new _icons.Error("Error: " + response.status + response.statusText);
+        console.log(errorMessage);
+        throw errorMessage; // throw the error message
+      }
+    }).then(function (response) {
+      return dispatch(editItemValue(item));
+    })["catch"](function (error) {
+      console.log("ERROR: " + error.status + error.statusText);
+      alert("We coudn't update your item." + error.message);
+    });
+  };
+};
+
+exports.editItem = editItem;

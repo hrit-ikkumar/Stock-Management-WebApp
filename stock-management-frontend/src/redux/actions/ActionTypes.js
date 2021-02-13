@@ -5,5 +5,6 @@ export const ADD_ITEM = 'ADD_ITEM';
 export const DELETE_ITEM = 'DELETE_ITEM';
 export const INC_ITEM_STOCK = 'INC_ITEM_STOCK';
 export const DEC_ITEM_STOCK = 'DEC_ITEM_STOCK';
+export const EDIT_ITEM = 'EDIT_ITEM';
 
 

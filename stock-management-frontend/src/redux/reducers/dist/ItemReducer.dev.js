@@ -66,14 +66,31 @@ var Items = function Items() {
         });
       }
 
-    case ActionTypes.INC_ITEM_STOCK:
+    case ActionTypes.EDIT_ITEM:
       {
         var _index = state.items.findIndex(function (x) {
-          return x._id === action.payload;
+          return x._id === action.payload._id;
         });
 
         if (_index !== undefined) {
-          state.items[_index].currentStock += 1;
+          state.items[_index] = action.payload;
+        }
+
+        return _objectSpread({}, state, {
+          isLoading: false,
+          errorMessage: null,
+          items: state.items
+        });
+      }
+
+    case ActionTypes.INC_ITEM_STOCK:
+      {
+        var _index2 = state.items.findIndex(function (x) {
+          return x._id === action.payload;
+        });
+
+        if (_index2 !== undefined) {
+          state.items[_index2].currentStock += 1;
         }
 
         return _objectSpread({}, state, {
@@ -85,12 +102,12 @@ var Items = function Items() {
 
     case ActionTypes.DEC_ITEM_STOCK:
       {
-        var _index2 = state.items.findIndex(function (x) {
+        var _index3 = state.items.findIndex(function (x) {
           return x._id === action.payload;
         });
 
-        if (_index2 !== undefined) {
-          state.items[_index2].currentStock -= 1;
+        if (_index3 !== undefined) {
+          state.items[_index3].currentStock -= 1;
         }
 
         return _objectSpread({}, state, {

@@ -37,6 +37,11 @@ export const decrementItemStock = (id) => ({
     payload: id
 });
 
+export const editItemValue = (item) => ({
+    type: ActionTypes.EDIT_ITEM,
+    payload: item
+});
+
 
 export const fetchItem = () => (dispatch) => {
     dispatch(itemLoading(true));
@@ -210,3 +215,29 @@ export const deleteItem = (id) => (dispatch) => {
     }) 
 }
 
+export const editItem = (item) => (dispatch) => {
+    return fetch(baseUrl + 'itemRouter/' + item._id, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'same-origin'
+    })
+    .then(response => {
+        if(response.ok)
+        {
+            return response;
+        }
+        else
+        {
+            var errorMessage = new Error("Error: " + response.status + response.statusText);
+            console.log(errorMessage);
+            throw errorMessage; // throw the error message
+        }
+    })
+    .then(response => dispatch(editItemValue(item)))
+    .catch(error => {
+        console.log("ERROR: " + error.status + error.statusText);
+        alert("We coudn't update your item." + error.message);
+    });
+}

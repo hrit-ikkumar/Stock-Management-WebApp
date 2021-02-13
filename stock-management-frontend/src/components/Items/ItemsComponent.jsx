@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
-import SaveIcon from '@material-ui/icons/Save';
 import DeleteIcon from '@material-ui/icons/Delete';
 import AddIcon from '@material-ui/icons/Add';
 import './index.css'; // custom css
@@ -12,6 +11,8 @@ import RemoveIcon from '@material-ui/icons/Remove';
 import Grid from '@material-ui/core/Grid';
 import CreateItemComponent from './CreateItemComponent/CreateItemComponent';
 import ViewItemComponent from './ViewItemComponent/ViewItemComponent';
+import EditItemComponent from './EditItemComponents/EditItemComponent';
+
 
 const useStyles = (theme) => ({
     root: {
@@ -62,7 +63,8 @@ class Items extends Component{
                                 subheader={`Company: ${item.manufacturingCompany}`}
                             />
                             <CardContent orientation="horizontal">
-                                <Typography>
+                                <Typography
+                                    color="textPrimary">
                                     {`Stocks: ${item.currentStock}`}
                                 </Typography>
                                 <ButtonGroup>
@@ -87,11 +89,7 @@ class Items extends Component{
                                     spacing={2}
                                     orientation="horizontal"
                                     fullWidth>
-                                    <Button
-                                        startIcon={<SaveIcon />}
-                                        color="primary">
-                                        Edit
-                                    </Button>
+                                    <EditItemComponent item={item} editItem={this.props.editItem}/>
                                     <ViewItemComponent item={item} />
                                     <Button
                                         startIcon={<DeleteIcon />}
