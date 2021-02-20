@@ -153,8 +153,8 @@ indexRouter.route('/withoutDate')
         })
         .then((items) => {
             res.statusCode = 200;
-            res.setHeader('Content-Type', 'application/text');
-            res.send("Item has been created!");    
+            res.setHeader('Content-Type', 'application/json');
+            res.send(items);    
         }, (err) => next(err))
         .catch((err) => {
             res.statusCode = 400;
@@ -226,6 +226,7 @@ indexRouter.route('/:id')
     },
     (err) => next(err)
 )
+
 // 2. Users should be able to edit an existing item
 .put(
     param('id')
@@ -250,13 +251,13 @@ indexRouter.route('/:id')
             }
             else
             {
-                ITEMS.updateOne({"_id": req.params.id}, {"$set": req.query})
+                ITEMS.findOneAndUpdate({"_id": req.params.id}, {"$set": req.query}, {returnNewDocument: true})
                 .then(item => {
                     if(item == null)
                         res.send('Error');
                     res.statusCode = 200; // Successfull creation of item in db
                     res.setHeader('Content-Type', 'application/json');
-                    res.json('Successfully updated!');
+                    res.json(item);
                 })
                 .catch((err) => {
                     // EDIT Forget
@@ -296,8 +297,8 @@ indexRouter.route('/:id')
                 else
                 {
                     res.statusCode = 200; // Successfull
-                    res.setHeader('Content-Type', 'application/text');
-                    res.send('Successfully deleted'); 
+                    res.setHeader('Content-Type', 'application/json');
+                    res.send(item); 
                 }
             }, (err) => next(err))
             .catch((err) => {
@@ -420,8 +421,7 @@ indexRouter.route('/:id/currentStock')
         }
         else
         {
-            // findOneAndUpdate use new
-            ITEMS.updateOne({"_id": req.params.id}, {"$inc": {"currentStock": req.body.changeBy}})
+            ITEMS.findOneAndUpdate({"_id": req.params.id}, {"$inc": {"currentStock": req.body.changeBy}}, {returnNewDocument: true})
             .then((item) => {
                 res.statusCode = 200; // success
                 res.setHeader('Content-Type', 'application/json');

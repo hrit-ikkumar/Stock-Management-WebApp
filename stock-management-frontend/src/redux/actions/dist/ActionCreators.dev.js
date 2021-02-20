@@ -116,6 +116,7 @@ exports.fetchItem = fetchItem;
 
 var postItem = function postItem(itemName, dateAdded, currentStock, manufacturingCompany) {
   return function (dispatch) {
+    console.log("POSTITEM (ACTION CREATOR)");
     var newItem = {
       itemName: itemName,
       dateAdded: dateAdded,

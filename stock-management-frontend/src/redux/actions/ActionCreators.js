@@ -69,6 +69,7 @@ export const fetchItem = () => (dispatch) => {
 }
 
 export const postItem = (itemName, dateAdded, currentStock, manufacturingCompany) => (dispatch) => {
+    console.log("POSTITEM (ACTION CREATOR)");
     const newItem = {
         itemName: itemName,
         dateAdded: dateAdded,

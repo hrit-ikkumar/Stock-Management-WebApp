@@ -22,17 +22,18 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 var defaultState = {
   isLoading: true,
   errorMessage: null,
-  selectedItem: null,
   items: []
 };
 
 var Items = function Items() {
   var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : defaultState;
   var action = arguments.length > 1 ? arguments[1] : undefined;
+  console.log("ITEMS REDUCER");
 
   switch (action.type) {
     case ActionTypes.CREATE_ITEM:
       {
+        state.items = action.payload;
         return _objectSpread({}, state, {
           isLoading: false,
           errorMessage: null,
@@ -42,21 +43,28 @@ var Items = function Items() {
 
     case ActionTypes.ADD_ITEM:
       {
+        var newItems = state.items;
+        newItems = newItems.concat(action.payload);
+        state.items = newItems;
         return _objectSpread({}, state, {
           isLoading: false,
           errorMessage: null,
-          items: state.items.concat(action.payload)
+          items: state.items
         });
       }
 
     case ActionTypes.DELETE_ITEM:
       {
-        var index = state.items.findIndex(function (x) {
+        var _newItems = state.items;
+
+        var index = _newItems.findIndex(function (x) {
           return x._id === action.payload;
         });
 
         if (index !== undefined) {
-          state.items.splice(index, 1);
+          _newItems.splice(index, 1);
+
+          state.items = _newItems;
         }
 
         return _objectSpread({}, state, {
@@ -68,12 +76,15 @@ var Items = function Items() {
 
     case ActionTypes.EDIT_ITEM:
       {
-        var _index = state.items.findIndex(function (x) {
+        var _newItems2 = state.items;
+
+        var _index = _newItems2.findIndex(function (x) {
           return x._id === action.payload._id;
         });
 
         if (_index !== undefined) {
-          state.items[_index] = action.payload;
+          _newItems2[_index] = action.payload;
+          state.items = _newItems2;
         }
 
         return _objectSpread({}, state, {
@@ -85,13 +96,15 @@ var Items = function Items() {
 
     case ActionTypes.INC_ITEM_STOCK:
       {
-        // create a copy of items then update 
-        var _index2 = state.items.findIndex(function (x) {
+        var _newItems3 = state.items;
+
+        var _index2 = _newItems3.findIndex(function (x) {
           return x._id === action.payload;
         });
 
         if (_index2 !== undefined) {
-          state.items[_index2].currentStock += 1;
+          _newItems3[_index2].currentStock = Number(_newItems3[_index2].currentStock) + 1;
+          state.items = _newItems3;
         }
 
         return _objectSpread({}, state, {

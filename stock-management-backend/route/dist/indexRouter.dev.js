@@ -167,8 +167,8 @@ body('itemName').isString().withMessage('itemName should be string') // conditio
       manufacturingCompany: request.body.manufacturingCompany
     }).then(function (items) {
       res.statusCode = 200;
-      res.setHeader('Content-Type', 'application/text');
-      res.send("Item has been created!");
+      res.setHeader('Content-Type', 'application/json');
+      res.send(items);
     }, function (err) {
       return next(err);
     })["catch"](function (err) {
@@ -251,16 +251,18 @@ indexRouter.route('/:id').get(param('id').custom(function (value) {
     res.setHeader('Content-Type', 'application/text');
     res.send('DELETE IS INVALID' + JSON.stringify(erros));
   } else {
-    ITEMS.updateOne({
+    ITEMS.findOneAndUpdate({
       "_id": req.params.id
     }, {
       "$set": req.query
+    }, {
+      returnNewDocument: true
     }).then(function (item) {
       if (item == null) res.send('Error');
       res.statusCode = 200; // Successfull creation of item in db
 
       res.setHeader('Content-Type', 'application/json');
-      res.json('Successfully updated!');
+      res.json(item);
     })["catch"](function (err) {
       // EDIT Forget
       res.statusCode = 400;
@@ -297,8 +299,8 @@ indexRouter.route('/:id').get(param('id').custom(function (value) {
               } else {
                 res.statusCode = 200; // Successfull
 
-                res.setHeader('Content-Type', 'application/text');
-                res.send('Successfully deleted');
+                res.setHeader('Content-Type', 'application/json');
+                res.send(item);
               }
             }, function (err) {
               return next(err);
@@ -407,13 +409,14 @@ indexRouter.route('/:id/currentStock').get(param('id').custom(function (id) {
     res.setHeader('Content-Type', 'application/text');
     res.send('INVALID PUT REQUEST: ' + JSON.stringify(errors));
   } else {
-    // findOneAndUpdate use new
-    ITEMS.updateOne({
+    ITEMS.findOneAndUpdate({
       "_id": req.params.id
     }, {
       "$inc": {
         "currentStock": req.body.changeBy
       }
+    }, {
+      returnNewDocument: true
     }).then(function (item) {
       res.statusCode = 200; // success
 
