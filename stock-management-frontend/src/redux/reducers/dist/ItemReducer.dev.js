@@ -24,6 +24,9 @@ var defaultState = {
   errorMessage: null,
   items: []
 };
+/*
+
+*/
 
 var Items = function Items() {
   var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : defaultState;
@@ -31,6 +34,8 @@ var Items = function Items() {
   console.log("ITEMS REDUCER");
 
   switch (action.type) {
+    // name
+    // promise middleware
     case ActionTypes.CREATE_ITEM:
       {
         state.items = action.payload;
@@ -83,8 +88,7 @@ var Items = function Items() {
         });
 
         if (_index !== undefined) {
-          _newItems2[_index] = action.payload;
-          state.items = _newItems2;
+          _newItems2[_index] = action.payload; //state.items = newItems;
         }
 
         return _objectSpread({}, state, {

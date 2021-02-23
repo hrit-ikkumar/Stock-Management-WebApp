@@ -5,10 +5,14 @@ const defaultState = {
     errorMessage: null,
     items: []
 };
+/*
 
+*/
 export const Items = (state=defaultState , action) => {
     console.log("ITEMS REDUCER");
     switch(action.type) {
+        // name
+        // promise middleware
         case ActionTypes.CREATE_ITEM:
         {
             state.items = action.payload;
@@ -40,7 +44,7 @@ export const Items = (state=defaultState , action) => {
             if(index !== undefined)
             {
                 newItems[index]=  action.payload;
-                state.items = newItems;
+                //state.items = newItems;
             }
 
             return {...state, isLoading: false, errorMessage: null, items: state.items};
