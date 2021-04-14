@@ -105,7 +105,7 @@ var fetchItem = function fetchItem() {
     }).then(function (response) {
       return response.json();
     }).then(function (items) {
-      return dispatch(appendItem(items));
+      return dispatch(appendItem(items.reverse()));
     })["catch"](function (error) {
       return dispatch(itemFailed(error.message));
     });

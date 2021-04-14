@@ -1,7 +1,7 @@
 import { Error } from '@material-ui/icons';
 import * as ActionTypes from './ActionTypes';
 
-const baseUrl = "http://localhost:3001/";
+const baseUrl = "https://stock-management-webapp.herokuapp.com/";
 
 export const addItem = (item) => ({ 
     type: ActionTypes.CREATE_ITEM,
@@ -64,7 +64,7 @@ export const fetchItem = () => (dispatch) => {
             throw errMessage;
         })
         .then(response => response.json())
-        .then(items => dispatch(appendItem(items)))
+        .then(items => dispatch(appendItem(items.reverse())))
         .catch(error => dispatch(itemFailed(error.message)));
 }
 

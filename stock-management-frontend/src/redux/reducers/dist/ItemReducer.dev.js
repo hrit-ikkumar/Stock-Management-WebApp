@@ -49,7 +49,9 @@ var Items = function Items() {
     case ActionTypes.ADD_ITEM:
       {
         var newItems = state.items;
-        newItems = newItems.concat(action.payload);
+        var newItem = action.payload;
+        newItem = newItem.concat(newItems);
+        newItems = newItem;
         state.items = newItems;
         return _objectSpread({}, state, {
           isLoading: false,

@@ -21,7 +21,9 @@ export const Items = (state=defaultState , action) => {
         case ActionTypes.ADD_ITEM:
         {
             let newItems = state.items;
-            newItems = newItems.concat(action.payload);
+            let newItem = action.payload;
+            newItem = newItem.concat(newItems);
+            newItems = newItem;
             state.items = newItems;
             return {...state, isLoading: false, errorMessage: null, items: state.items};
         }
